@@ -576,3 +576,89 @@ fn the_position_is_not_written_to_disk() {
     assert!(!state.contains("48.37"), "{state}");
     assert!(!state.contains("10.90"), "{state}");
 }
+
+fn dashboard_without(id: &str) -> String {
+    let mut list: Vec<serde_json::Value> = serde_json::from_str(DASHBOARD).unwrap();
+    list.retain(|entry| entry["id"] != id);
+    serde_json::to_string(&list).unwrap()
+}
+
+#[test]
+fn places_are_told_apart_by_name_and_district_together() {
+    let b = bench();
+    b.engine.add_place("Aach", "07235", 0).unwrap();
+    assert!(b.engine.add_place("Aach", "08335", 0).is_ok());
+    b.engine.add_place("Aschheim", "09184", 0).unwrap();
+    assert!(b.engine.add_place("Aying", "09184", 0).is_ok());
+    assert_eq!(b.engine.add_place("Aying", "09184", 5), Err(AddError::Duplicate));
+    b.engine.add_place("Achim", "03158", 0).unwrap();
+    let saved: Vec<(String, bool)> = b
+        .engine
+        .search("Achim")
+        .into_iter()
+        .filter(|hit| hit.name == "Achim")
+        .map(|hit| (hit.district, hit.saved))
+        .collect();
+    assert_eq!(
+        saved,
+        vec![("03158".to_owned(), true), ("03361".to_owned(), false)]
+    );
+    let neighbour = b.engine.search("Brunnthal").remove(0);
+    assert_eq!((neighbour.district.as_str(), neighbour.saved), ("09184", false));
+}
+
+#[test]
+fn another_setting_keeps_the_position_and_switching_location_off_forgets_it() {
+    let b = bench();
+    assert!(b.engine.set_setting("location", json!(true)));
+    assert!(b.engine.set_position(48.37, 10.90, T0));
+    assert_eq!(b.engine.view(T0).location, "on");
+    assert!(b.engine.set_setting("interval", json!(15)));
+    assert_eq!(b.engine.view(T0).location, "on");
+    assert!(b.engine.set_setting("location", json!(false)));
+    assert!(b.engine.set_setting("location", json!(true)));
+    assert_eq!(b.engine.view(T0).location, "waiting");
+}
+
+#[test]
+fn details_of_a_warning_that_left_are_dropped_and_asked_again_when_it_returns() {
+    let b = bench();
+    b.net.munich();
+    b.engine.add_place("München", "09162", 0).unwrap();
+    let detail = format!("/warnings/{FIRE}.json");
+    b.engine.refresh(T0);
+    b.engine.refresh(T0 + MINUTE);
+    assert_eq!(b.net.count(&detail), 1);
+    b.net
+        .answer("/dashboard/091620000000.json", &dashboard_without(FIRE));
+    b.engine.refresh(T0 + 2 * MINUTE);
+    let reopened = open(&b.dir, &b.net);
+    b.net.munich();
+    reopened.refresh(T0 + 3 * MINUTE);
+    assert_eq!(b.net.count(&detail), 2);
+}
+
+#[test]
+fn a_failed_check_at_the_time_of_a_good_one_still_counts_as_failed() {
+    let b = bench();
+    b.net.munich();
+    b.engine.add_place("München", "09162", 0).unwrap();
+    b.engine.refresh(T0);
+    assert!(!b.engine.view(T0).failing);
+    b.net.down(true);
+    b.engine.refresh(T0);
+    assert!(b.engine.view(T0).failing);
+}
+
+#[test]
+fn news_after_a_failed_check_still_alert() {
+    let b = bench();
+    b.engine.add_place("München", "09162", 0).unwrap();
+    b.net.answer("/dashboard/091620000000.json", "[]");
+    b.engine.refresh(T0);
+    b.net.down(true);
+    b.engine.refresh(T0 + MINUTE);
+    b.net.down(false);
+    b.net.munich();
+    assert_eq!(b.engine.refresh(T0 + 2 * MINUTE).len(), 3);
+}

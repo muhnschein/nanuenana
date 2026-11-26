@@ -183,6 +183,41 @@ mod tests {
     }
 
     #[test]
+    fn slanted_edges_are_followed() {
+        let polygon = Polygon {
+            outer: vec![
+                Point::new(48.0, 11.0),
+                Point::new(48.4, 11.2),
+                Point::new(48.0, 11.8),
+            ],
+            holes: vec![],
+        };
+        assert!(polygon.contains(Point::new(48.2, 11.12)));
+        assert!(!polygon.contains(Point::new(48.2, 11.08)));
+        assert!(polygon.contains(Point::new(48.2, 11.48)));
+        assert!(!polygon.contains(Point::new(48.2, 11.52)));
+        assert!(polygon.contains(Point::new(48.3, 11.17)));
+        assert!(!polygon.contains(Point::new(48.3, 11.13)));
+        assert!(polygon.contains(Point::new(48.3, 11.33)));
+        assert!(!polygon.contains(Point::new(48.3, 11.37)));
+    }
+
+    #[test]
+    fn western_edge_counts_as_inside_and_eastern_edge_as_outside() {
+        let polygon = Polygon {
+            outer: vec![
+                Point::new(48.0, 11.0),
+                Point::new(49.0, 11.0),
+                Point::new(49.0, 12.0),
+                Point::new(48.0, 12.0),
+            ],
+            holes: vec![],
+        };
+        assert!(polygon.contains(Point::new(48.5, 11.0)));
+        assert!(!polygon.contains(Point::new(48.5, 12.0)));
+    }
+
+    #[test]
     fn concave_ring_containment() {
         let outer = vec![
             Point::new(0.0, 0.0),

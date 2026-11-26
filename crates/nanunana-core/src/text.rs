@@ -24,19 +24,18 @@ fn tag_name(tag: &str) -> String {
 fn without_tags(markup: &str) -> String {
     let mut out = String::with_capacity(markup.len());
     let mut rest = markup;
-    while let Some(open) = rest.find('<') {
-        let after = &rest[open + 1..];
+    while let Some((before, after)) = rest.split_once('<') {
         let named = after.starts_with(|c: char| c.is_ascii_alphabetic() || c == '/');
-        match after.find('>') {
-            Some(close) if named => {
-                out.push_str(&rest[..open]);
-                if BREAKING.contains(&tag_name(&after[..close]).as_str()) {
+        out.push_str(before);
+        match after.split_once('>') {
+            Some((tag, tail)) if named => {
+                if BREAKING.contains(&tag_name(tag).as_str()) {
                     out.push('\n');
                 }
-                rest = &after[close + 1..];
+                rest = tail;
             }
             _ => {
-                out.push_str(&rest[..=open]);
+                out.push('<');
                 rest = after;
             }
         }
