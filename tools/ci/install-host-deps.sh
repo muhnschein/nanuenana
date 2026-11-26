@@ -1,0 +1,36 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-or-later
+set -eu
+here=$(cd "$(dirname "$0")" && pwd)
+packages="qtbase5-dev qttools5-dev-tools qtdeclarative5-dev qml-module-qtquick2 pkg-config"
+for tool in "$@"; do
+    case $tool in
+        nextest | mutants) ;;
+        coverage) packages="$packages python3-coverage" ;;
+        cross) packages="$packages libc6-i386" ;;
+        *) echo "unknown tool $tool" >&2; exit 2 ;;
+    esac
+done
+if [ "${GITHUB_ACTIONS:-}" = true ]; then
+    DEBIAN_FRONTEND=noninteractive "$here/apt-install.sh" --no-install-recommends $packages
+else
+    sudo apt-get update -q
+    sudo apt-get install -y -q --no-install-recommends $packages
+fi
+rustup show active-toolchain || rustup toolchain install
+cargo_tool() {
+    crate=$1 version=$2
+    if cargo "${crate#cargo-}" --version 2> /dev/null | grep -qF " $version"; then
+        echo "$crate $version already installed"
+    else
+        cargo +stable install --locked "$crate@$version"
+    fi
+}
+for tool in "$@"; do
+    case $tool in
+        nextest) cargo_tool cargo-nextest 0.9.148 ;;
+        coverage) cargo_tool cargo-llvm-cov 0.6.16 ;;
+        mutants) cargo_tool cargo-mutants 25.0.1 ;;
+        *) ;;
+    esac
+done

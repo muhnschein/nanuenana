@@ -1,0 +1,6 @@
+paths-ignore:
+  - crates/*/tests
+  - crates/*/src/**/tests.rs
+  - crates/*/src/**/tests
+  - tests
+  - third_party

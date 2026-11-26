@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Places: long press</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">Places</div>
+    <div class="hdr-d">Updated 14:32</div>
+  </div>
+
+  <button class="li tall">
+    <div class="li-b">
+      <div class="li-t"><svg class="ic hl" viewBox="0 0 24 24" role="img" aria-label="Current location" style="width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px"><path d="M12 21s-6-6.2-6-11a6 6 0 0 1 12 0c0 4.800-6 11-6 11z"/><circle cx="12" cy="10" r="2.2"/></svg>Augsburg</div>
+      <div class="li-s">Amtliche WARNUNG vor FROST</div>
+      <div class="lvrow l1"><span class="lv l1" role="img" aria-label="Level 1 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Information</span><span>· 1 warning</span></div>
+    </div>
+    <div class="li-r">Current<br>location</div>
+  </button>
+
+  <button class="li tall">
+    <div class="li-b">
+      <div class="li-t">München</div>
+      <div class="li-s">Rauchentwicklung durch Großbrand</div>
+      <div class="lvrow l3"><span class="lv l3" role="img" aria-label="Level 3 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Danger</span><span>· 3 warnings</span></div>
+    </div>
+    <div class="li-r">5 km</div>
+  </button>
+
+  <button class="li tall pressed">
+    <div class="li-b">
+      <div class="li-t">Rehlingen-Siersburg</div>
+      <div class="li-s">Trinkwasser: Abkochgebot</div>
+      <div class="lvrow l1"><span class="lv l1" role="img" aria-label="Level 1 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Information</span><span>· 1 warning</span></div>
+    </div>
+    <div class="li-r">Whole<br>district</div>
+  </button>
+  <div class="cm">
+    <button class="mi">Change area</button>
+    <button class="mi on">Remove</button>
+  </div>
+
+  <button class="li tall">
+    <div class="li-b">
+      <div class="li-t">Hamburg</div>
+      <div class="li-s">No warnings</div>
+      <div class="lvrow"><span class="lv" role="img" aria-label="No level"><i></i><i></i><i></i><i></i></span><span>Checked 14:32</span></div>
+    </div>
+    <div class="li-r">2 km</div>
+  </button>
+
+  <div class="unoff bottom">Unofficial app. In an emergency follow sirens, cell broadcast, radio and the authorities.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

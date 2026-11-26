@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Place: update failed</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">Köln</div>
+    <div class="hdr-d">1 km · not updated since 13:05</div>
+  </div>
+
+  <div class="box">
+    <svg class="ic err" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+    <div>
+      <div class="err" style="font-size: 17px">Warnings may be missing</div>
+      <div style="margin-top: 4px">Nanünana could not reach warnung.bund.de since 13:05. No data connection. It tries again when the connection is back.</div>
+    </div>
+  </div>
+  <div class="btns"><button class="btn">Try now</button></div>
+
+  <div class="sh">As of 13:05</div>
+  <button class="li tall dim">
+    <div class="li-ic l2" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="Flood"><path d="M5 11.5l7-6 7 6M7 10.5v4.5h10v-4.5M3 19c1.5-1.2 3-1.2 4.5 0s3 1.2 4.5 0 3-1.2 4.5 0 3 1.2 4.5 0"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Hochwasserinformation Rhein</div>
+      <div class="li-s">Hochwasserportal · since Wed 18:00</div>
+      <div class="lvrow l2"><span class="lv l2" role="img" aria-label="Level 2 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Warning</span><span>· Flood</span></div>
+    </div>
+  </button>
+
+  <div class="unoff bottom">Unofficial display of official warnings. Follow sirens, cell broadcast and radio.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

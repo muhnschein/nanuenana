@@ -1,0 +1,92 @@
+name: Mutation
+on:
+  schedule:
+    - cron: '17 2 * * 1'
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - .cargo/mutants.toml
+      - .github/workflows/mutation.yml
+permissions:
+  contents: read
+concurrency:
+  group: mutation-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  changed:
+    name: Main changed since the last run
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last=""
+          if [ "$GITHUB_EVENT_NAME" = schedule ]; then
+            last=$(gh run list -R "$GITHUB_REPOSITORY" --workflow mutation.yml --branch main \
+              --event schedule --status success --limit 1 --json headSha --jq '.[0].headSha // ""')
+          fi
+          if [ "$last" = "$GITHUB_SHA" ]; then
+            echo "main is still at $last, which passed; skipping."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  mutation:
+    name: Tests bite (mutation check ${{ matrix.shard }}/8)
+    needs: changed
+    if: needs.changed.outputs.run == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - uses: taiki-e/install-action@1e29709c0ec63babbe8f266397a465f29a825f91
+        with:
+          tool: cargo-mutants@25.0.1
+      - name: Install dependencies
+        run: ./tools/ci/install-host-deps.sh mutants
+      - name: Mutation check
+        run: make mutants MUTANTS_SHARD=${{ matrix.shard }}/8
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: failure()
+        with:
+          name: mutants-${{ matrix.shard }}
+          path: mutants.out/*.txt
+
+  report:
+    name: Report a failed weekly run
+    needs: mutation
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Weekly mutation check failed
+          BODY: >-
+            The weekly mutation check failed on main at ${{ github.sha }}:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}.
+            Each failed shard uploads the missed mutants (mutants.out/*.txt) as an artifact.
+        run: |
+          open=$(gh issue list -R "$GITHUB_REPOSITORY" --state open --search "in:title \"$TITLE\"" \
+            --json number --jq '.[0].number // ""')
+          if [ -n "$open" ]; then
+            gh issue comment "$open" -R "$GITHUB_REPOSITORY" --body "$BODY"
+          else
+            gh issue create -R "$GITHUB_REPOSITORY" --title "$TITLE" --body "$BODY"
+          fi

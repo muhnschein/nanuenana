@@ -1,0 +1,283 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+import QtQuick 2.6
+import Sailfish.Silica 1.0
+import Nanunana 1.0
+import "../../qml/cover"
+import "Probe.js" as Probe
+
+ApplicationWindow {
+    id: test
+
+    property bool reachedEnd
+    property bool scenarioRunning: true
+    property int at
+    property int waits
+    property var places: null
+    property var lastNotices: null
+    readonly property string fire: "mow.DE-BY-M-SE089-20261126-89-001"
+    readonly property var steps: [
+        openPlaces, acceptNotice, addMunich, munichListed, munichPage, fireWarning, coverWarned,
+        addCologne, cologneStale, settingsPage, aboutPage, searchPage, areaDialog, areaSaved, changeArea,
+        areaChanged, areaIsDistrict, removeAll
+    ]
+
+    function page(name) {
+        return Qt.resolvedUrl("../../qml/pages/" + name + ".qml")
+    }
+
+    function view() {
+        return JSON.parse(App.stateJson)
+    }
+
+    function settings() {
+        return JSON.parse(App.settingsJson)
+    }
+
+    function placeNamed(name) {
+        var list = view().places
+        for (var i = 0; i < list.length; ++i) {
+            if (list[i].name === name)
+                return list[i]
+        }
+        return null
+    }
+
+    function backToPlaces() {
+        pageStack.pop(test.places, PageStackAction.Immediate)
+    }
+
+    function tick() {
+        if (pageStack.busy || App.checking)
+            return
+        if (at >= steps.length) {
+            reachedEnd = true
+            scenarioRunning = false
+            return
+        }
+        if (steps[at]() === false && waits < 1500) {
+            waits += 1
+            return
+        }
+        Probe.expect(waits < 1500, "step " + at + " never became ready")
+        waits = 0
+        at += 1
+    }
+
+    function openPlaces() {
+        Probe.expect(!view().noticeAccepted, "first start: notice not accepted")
+        Probe.expect(view().places.length === 0, "first start: no places")
+        Probe.expect(App.setSetting("language", JSON.stringify("de")), "warning language set")
+        test.places = pageStack.push(page("PlacesPage"), {}, PageStackAction.Immediate)
+    }
+
+    function acceptNotice() {
+        if (pageStack.depth < 2)
+            return false
+        var title = Probe.text(pageStack.currentPage, "noticeTitle")
+        Probe.expect(title === qsTrId("nanunana-notice-title"), "notice title: " + title)
+        pageStack.currentPage.accept()
+    }
+
+    function addMunich() {
+        Probe.expect(view().noticeAccepted, "accepting the dialog records it")
+        Probe.expect(pageStack.currentPage === test.places, "accepting returns to the places")
+        Probe.expect(Probe.one(test.places, "placesEmpty").enabled, "no places: the hint shows")
+        Probe.expect(App.addPlace("München", "09162", 0) === "", "München is added")
+        Probe.expect(App.addPlace("München", "09162", 0) === "duplicate", "a place is added once")
+        Probe.expect(App.addPlace("Nirgendwo", "09162", 0) === "unknown", "unknown places are refused")
+        Probe.expect(App.addPlace("München", "09162", 99) === "unknown", "areas over 25 km are refused")
+        test.lastNotices = null
+        App.check()
+    }
+
+    function munichListed() {
+        Probe.expect(test.lastNotices !== null && test.lastNotices.length === 0, "the first check of a place alerts nothing")
+        var place = placeNamed("München")
+        if (!Probe.expect(place !== null && !place.stale, "München is up to date"))
+            return
+        Probe.expect(place.level === 3, "München's highest level is danger: " + place.level)
+        Probe.expect(place.warnings.length >= 2 && place.ended.length === 1, "München lists warnings and one all-clear")
+        Probe.expect(!Probe.one(test.places, "placesEmpty").enabled, "with a place the hint is gone")
+        Probe.expect(Probe.text(test.places, "placeName") === "München", "row name")
+        Probe.expect(Probe.text(test.places, "placeHeadline") === "Rauchentwicklung durch Großbrand", "row headline: " + Probe.text(test.places, "placeHeadline"))
+        Probe.expect(Probe.text(test.places, "placeArea") === qsTrId("nanunana-area-district"), "row area")
+        Probe.expect(Probe.one(test.places, "placeLevel").level === 3, "row level")
+        pageStack.push(page("PlacePage"), { "placeId": place.id }, PageStackAction.Immediate)
+    }
+
+    function munichPage() {
+        var shown = pageStack.currentPage
+        var place = placeNamed("München")
+        Probe.expect(Probe.one(shown, "placeHeader").title === "München", "place page title")
+        var rows = Probe.named(shown, "warningRow")
+        Probe.expect(rows.length === place.warnings.length, "one row per warning: " + rows.length)
+        Probe.expect(Probe.named(shown, "endedRow").length === 1, "one ended row")
+        var headlines = Probe.texts(shown, "warningHeadline")
+        Probe.expect(headlines[0] === "Rauchentwicklung durch Großbrand", "the highest level comes first: " + headlines[0])
+        Probe.expect(!Probe.one(shown, "staleBox").visible, "an up-to-date place shows no stale box")
+        Probe.expect(!Probe.one(shown, "placeClear").enabled, "a warned place is not called clear")
+        Probe.expect(Probe.text(shown, "placeFooter").length > 0, "the footer says it is unofficial")
+        pageStack.push(page("WarningPage"), { "warningId": test.fire }, PageStackAction.Immediate)
+    }
+
+    function fireWarning() {
+        var shown = pageStack.currentPage
+        Probe.expect(Probe.text(shown, "warningTitle") === "Rauchentwicklung durch Großbrand", "warning title")
+        Probe.expect(Probe.text(shown, "warningLevel") === qsTrId("nanunana-level-danger"), "warning level: " + Probe.text(shown, "warningLevel"))
+        Probe.expect(Probe.one(shown, "warningHeader").title === qsTrId("nanunana-category-civil"), "warning category")
+        var description = Probe.text(shown, "warningDescription")
+        Probe.expect(description.indexOf("Lagerhalle") >= 0 && description.indexOf("<") < 0, "description as plain text: " + description)
+        Probe.expect(Probe.text(shown, "warningInstruction").indexOf("Fenster") >= 0, "instruction shown")
+        Probe.expect(!Probe.one(shown, "warningGone").enabled, "a listed warning is not gone")
+        Probe.expect(Probe.text(shown, "noteText").length > 0, "the unofficial note shows")
+        backToPlaces()
+        pageStack.push(coverHost, {}, PageStackAction.Immediate)
+    }
+
+    function coverWarned() {
+        var shown = pageStack.currentPage
+        Probe.expect(Probe.text(shown, "coverTitle") === qsTrId("nanunana-level-danger"), "cover level: " + Probe.text(shown, "coverTitle"))
+        Probe.expect(Probe.text(shown, "coverFirst") === "München", "cover place")
+        Probe.expect(Probe.text(shown, "coverSecond") === "Rauchentwicklung durch Großbrand", "cover headline")
+        backToPlaces()
+    }
+
+    function addCologne() {
+        Probe.expect(App.addPlace("Köln", "05315", 0) === "", "Köln is added")
+        test.lastNotices = null
+        App.check()
+    }
+
+    function cologneStale() {
+        var place = placeNamed("Köln")
+        if (!Probe.expect(place !== null && place.stale, "Köln, with no answer, is stale"))
+            return
+        var headlines = Probe.texts(test.places, "placeHeadline")
+        Probe.expect(headlines.length === 2 && headlines[1] === qsTrId("nanunana-places-never"), "the stale row says so: " + headlines)
+        pageStack.push(page("PlacePage"), { "placeId": place.id }, PageStackAction.Immediate)
+        var shown = pageStack.currentPage
+        Probe.expect(Probe.one(shown, "staleBox").visible, "the stale place shows its box")
+        Probe.expect(Probe.one(shown, "tryNow").visible, "and offers a retry")
+        Probe.expect(!Probe.one(shown, "placeClear").enabled, "a stale place is never called clear")
+        backToPlaces()
+        pageStack.push(coverHost, {}, PageStackAction.Immediate)
+        Probe.expect(Probe.text(pageStack.currentPage, "coverTitle") === qsTrId("nanunana-cover-stale"), "cover says not updated")
+        backToPlaces()
+        pageStack.push(page("SettingsPage"), {}, PageStackAction.Immediate)
+    }
+
+    function settingsPage() {
+        var shown = pageStack.currentPage
+        var location = Probe.one(shown, "location")
+        Probe.expect(!location.checked, "current location is off by default")
+        location.clicked(null)
+        Probe.expect(settings().location && location.checked, "the switch turns it on")
+        Probe.expect(view().location === "waiting", "on without a position: waiting")
+        location.clicked(null)
+        Probe.expect(!settings().location && view().location === "off", "and off again")
+        var weather = Probe.one(shown, "threshold-weather")
+        Probe.expect(weather.currentIndex === 1, "weather alerts from warning by default: " + weather.currentIndex)
+        weather.chosen("danger")
+        Probe.expect(settings().weather === "danger", "threshold saved")
+        var interval = Probe.one(shown, "interval")
+        interval.chosen(15)
+        Probe.expect(settings().interval === 15, "interval saved")
+        Probe.one(shown, "allClear").clicked(null)
+        Probe.expect(!settings().allClear, "all-clear switched off")
+        Probe.expect(!App.setSetting("interval", "7"), "odd intervals are refused")
+        Probe.one(shown, "about").clicked(null)
+    }
+
+    function aboutPage() {
+        Probe.expect(pageStack.depth === 3, "about opens from settings: depth " + pageStack.depth)
+        backToPlaces()
+        pageStack.push(page("AddPlacePage"), {}, PageStackAction.Immediate)
+    }
+
+    function searchPage() {
+        var shown = pageStack.currentPage
+        shown.query = "Rehlingen-S"
+        var names = Probe.named(shown, "hitRow")
+        Probe.expect(names.length === 1, "one hit for Rehlingen-S: " + names.length)
+        Probe.expect(Probe.text(shown, "hitDistrict") === "Landkreis Saarlouis, Saarland", "hit district: " + Probe.text(shown, "hitDistrict"))
+        shown.query = "München"
+        var rows = Probe.named(shown, "hitRow")
+        Probe.expect(rows.length > 0 && !rows[0].enabled, "a saved place cannot be added again")
+        shown.query = "Rehlingen-S"
+        Probe.one(shown, "hitRow").clicked(null)
+    }
+
+    function areaDialog() {
+        var shown = pageStack.currentPage
+        Probe.expect(Probe.text(shown, "areaName") === "Rehlingen-Siersburg", "area dialog names the place")
+        Probe.expect(shown.chosenKm === 5, "5 km by default: " + shown.chosenKm)
+        Probe.one(shown, "areaDistance").value = 7
+        Probe.expect(shown.chosenKm === 7, "the slider sets the distance")
+        Probe.expect(Probe.text(shown, "areaExplanation").indexOf("7 km") >= 0, "the explanation follows")
+        shown.accept()
+    }
+
+    function areaSaved() {
+        Probe.one(test.places, "placeList").positionViewAtEnd()
+        if (Probe.texts(test.places, "placeArea").indexOf(qsTrId("nanunana-area-km").arg(7)) < 0)
+            return false
+        Probe.expect(pageStack.currentPage === test.places, "saving returns to the places")
+        var place = placeNamed("Rehlingen-Siersburg")
+        Probe.expect(place !== null && place.km === 7, "the place is saved with its distance")
+    }
+
+    function changeArea() {
+        var place = placeNamed("Rehlingen-Siersburg")
+        pageStack.push(page("AreaDialog"), {
+            "placeId": place.id,
+            "name": place.name,
+            "districtName": place.districtName,
+            "stateName": place.stateName,
+            "km": place.km
+        }, PageStackAction.Immediate)
+    }
+
+    function areaChanged() {
+        var shown = pageStack.currentPage
+        Probe.expect(shown.chosenKm === 7, "the dialog opens with the saved distance: " + shown.chosenKm)
+        Probe.one(shown, "areaMode").currentIndex = 1
+        Probe.expect(shown.chosenKm === 0, "whole district chosen: " + shown.chosenKm)
+        shown.accept()
+    }
+
+    function areaIsDistrict() {
+        var place = placeNamed("Rehlingen-Siersburg")
+        Probe.expect(place !== null && place.km === 0, "the changed area is saved")
+        Probe.expect(view().places.length === 3, "changing an area adds no place")
+    }
+
+    function removeAll() {
+        var list = view().places
+        for (var i = 0; i < list.length; ++i)
+            Probe.expect(App.removePlace(list[i].id), "remove " + list[i].name)
+        Probe.expect(view().places.length === 0, "all places removed")
+        Probe.expect(Probe.one(test.places, "placesEmpty").enabled, "the hint is back")
+    }
+
+    Component {
+        id: coverHost
+
+        Page {
+            CoverPage {
+                anchors.fill: parent
+            }
+        }
+    }
+
+    Connections {
+        target: App
+        onChecked: test.lastNotices = JSON.parse(notices)
+    }
+
+    Timer {
+        interval: 20
+        repeat: true
+        running: test.scenarioRunning
+        onTriggered: test.tick()
+    }
+}

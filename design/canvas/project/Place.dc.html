@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Place: warnings</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">München</div>
+    <div class="hdr-d">5 km · updated 14:32</div>
+  </div>
+
+  <button class="li tall">
+    <div class="li-ic l3" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="Civil protection"><circle cx="12" cy="12" r="9"/><path d="M12 6.5l5.2 9H6.8z"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Rauchentwicklung durch Großbrand</div>
+      <div class="li-s">Integrierte Leitstelle München · since 13:41</div>
+      <div class="lvrow l3"><span class="lv l3" role="img" aria-label="Level 3 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Danger</span><span>· Civil protection</span></div>
+    </div>
+  </button>
+
+  <button class="li tall">
+    <div class="li-ic l2" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="Weather"><path d="M7 15.5a4 4 0 0 1 .6-8 5 5 0 0 1 9.6 1.2A3.4 3.4 0 0 1 17 15.5M12.5 12l-2.5 4h3l-2 4"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Amtliche WARNUNG vor SCHNEEFALL</div>
+      <div class="li-s">Deutscher Wetterdienst · until Fri 06:00</div>
+      <div class="lvrow l2"><span class="lv l2" role="img" aria-label="Level 2 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Warning</span><span>· Weather</span></div>
+    </div>
+  </button>
+
+  <button class="li tall">
+    <div class="li-ic l1" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="Weather"><path d="M7 15.5a4 4 0 0 1 .6-8 5 5 0 0 1 9.6 1.2A3.4 3.4 0 0 1 17 15.5M12.5 12l-2.5 4h3l-2 4"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Amtliche WARNUNG vor FROST</div>
+      <div class="li-s">Deutscher Wetterdienst · until Fri 10:00</div>
+      <div class="lvrow l1"><span class="lv l1" role="img" aria-label="Level 1 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Information</span><span>· Weather</span></div>
+    </div>
+  </button>
+
+  <div class="sh">Ended</div>
+  <button class="li tall dim">
+    <div class="li-ic"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="All-clear"><path d="M4 12l5 5L20 6"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Entwarnung: Bombenfund in Schwabing</div>
+      <div class="li-s">Polizei Bayern · 11:20</div>
+      <div class="lvrow"><span>All-clear · Police</span></div>
+    </div>
+  </button>
+
+  <div class="unoff bottom">Unofficial display of official warnings. Last successful update 14:32, next at about 14:37.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

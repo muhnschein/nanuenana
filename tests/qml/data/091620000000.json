@@ -1,0 +1,81 @@
+[
+  {
+    "id": "mow.DE-BY-M-SE089-20261126-89-001",
+    "payload": {
+      "version": 3,
+      "type": "ALERT",
+      "id": "mow.DE-BY-M-SE089-20261126-89-001",
+      "hash": "d72526da941f98cb79f25dc3f9b56474a313e2161fda46e91f146139811eca4a",
+      "data": {
+        "headline": "Rauchentwicklung durch Großbrand",
+        "provider": "MOWAS",
+        "severity": "Severe",
+        "msgType": "Update",
+        "transKeys": {"event": "BBK-EVC-010"},
+        "area": {"type": "ZGEM", "data": "1+09162000"}
+      }
+    },
+    "i18nTitle": {"de": "Rauchentwicklung durch Großbrand"},
+    "sent": "2026-11-26T13:41:00+01:00"
+  },
+  {
+    "id": "dwd.2.49.0.0.276.0.DWD.PVW.1795700000000.snow",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.2.49.0.0.276.0.DWD.PVW.1795700000000.snow",
+      "hash": "aa",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Moderate",
+        "msgType": "Alert",
+        "transKeys": {"event": "BBK-EVC-088"},
+        "area": {"type": "ZGEM", "data": "1+09162000"}
+      }
+    },
+    "i18nTitle": {"de": "Amtliche WARNUNG vor SCHNEEFALL"},
+    "sent": "2026-11-26T14:20:00+01:00",
+    "onset": "2026-11-26T18:00:00+01:00",
+    "expires": "2026-11-27T06:00:00+01:00"
+  },
+  {
+    "id": "pol.DE-BY-M-20261126-0001",
+    "payload": {
+      "version": 2,
+      "type": "ALERT",
+      "id": "pol.DE-BY-M-20261126-0001",
+      "hash": "bb",
+      "data": {
+        "headline": "Entwarnung: Bombenfund in Schwabing",
+        "provider": "POLICE",
+        "severity": "Minor",
+        "msgType": "Cancel"
+      }
+    },
+    "i18nTitle": {"de": "Entwarnung: Bombenfund in Schwabing"},
+    "sent": "2026-11-26T11:20:00+01:00"
+  },
+  {
+    "id": "lhp.HOCHWASSERZENTRALEN.DE.BY",
+    "payload": {
+      "version": 7,
+      "data": {
+        "headline": "Hochwasserinformation",
+        "provider": "LHP",
+        "severity": "Unknown",
+        "msgType": "Alert"
+      }
+    },
+    "sent": "2026-11-25T18:00:00+01:00",
+    "expires": null
+  },
+  {
+    "id": "mow.DE-BY-M-SE089-20261126-89-001",
+    "payload": {"version": 9, "data": {"headline": "Listed twice", "provider": "MOWAS", "severity": "Extreme", "msgType": "Alert"}}
+  },
+  {"id": "mow.no-title"},
+  {"id": "bad/id", "payload": {"version": 1}},
+  {"payload": {"version": 1}},
+  "not an entry"
+]

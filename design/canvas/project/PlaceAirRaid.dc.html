@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Air raid alert</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">Київ</div>
+    <div class="hdr-d">Whole city · updated 14:32:10</div>
+  </div>
+
+  <div class="box">
+    <svg class="ic err" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+    <div>
+      <div class="err" style="font-size: 17px">Do not wait for this app</div>
+      <div style="margin-top: 4px">Seconds count. Nanünana can be minutes late. Follow the sirens and the official Air Alert app.</div>
+    </div>
+  </div>
+
+  <button class="li tall">
+    <div class="li-ic l4" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="Air raid"><path d="M7 17v-4a5 5 0 0 1 10 0v4M5 17h14v3H5zM12 3v2.5M4.5 6.5L6.3 8.3M19.5 6.5l-1.8 1.8"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Повітряна тривога</div>
+      <div class="li-s">Air raid alert · м. Київ</div>
+      <div class="lvrow l4"><span class="lv l4" role="img" aria-label="Level 4 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Extreme danger</span></div>
+      <div class="lvrow"><span>Started 14:29:40 · reached this phone 2 min 30 s later</span></div>
+    </div>
+  </button>
+
+  <div class="sh">Ended</div>
+  <button class="li tall dim">
+    <div class="li-ic"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="All-clear"><path d="M4 12l5 5L20 6"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Відбій тривоги</div>
+      <div class="li-s">All-clear · м. Київ · 09:12</div>
+    </div>
+  </button>
+
+  <div class="unoff bottom">Unofficial display. Official channels: sirens, the Air Alert app, the city military administration.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

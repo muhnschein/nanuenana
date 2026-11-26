@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Place: no warnings</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">Hamburg</div>
+    <div class="hdr-d">2 km · updated 14:32</div>
+  </div>
+
+  <div class="ph" style="top: 300px">
+    <div class="ph-t">No warnings</div>
+    <div class="ph-h">Checked at 14:32.<br>Next check at about 14:37.</div>
+  </div>
+
+  <div class="unoff bottom">Unofficial display of official warnings. No warning here does not mean no danger: follow sirens, cell broadcast and radio.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

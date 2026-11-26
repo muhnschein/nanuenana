@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Second notice: Ukraine and Israel</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="dlg">
+    <button class="dlg-c">Cancel</button>
+    <button class="dlg-a">I understand</button>
+  </div>
+
+  <div style="padding: 6px 18px 0; display: flex; justify-content: flex-end">
+    <svg class="ic l err" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+  </div>
+  <div class="tx big err" style="text-align: right">Do not rely on Nanünana for air raid alerts</div>
+
+  <div class="tx" style="padding-top: 14px">You are adding a place in Ukraine. An air raid alert leaves you seconds to minutes. Nanünana asks for alerts only every few minutes and can be late by that much, or fail without telling you.</div>
+  <div class="tx">Use it to look things up. Never wait for it before you take shelter.</div>
+
+  <div class="sh">Official channels in Ukraine</div>
+  <div class="tx small">Sirens and loudspeakers.<br>The official app Повітряна тривога (Air Alert).<br>Regional and city channels of the military administrations.<br>Emergency calls: 112, 101.</div>
+
+  <div class="tx big hl" style="text-align: center; padding-top: 22px">Слава Україні!</div>
+  <div class="tx small sec" style="text-align: center">Take care of yourself and the people around you.</div>
+
+  <div class="unoff bottom">The place is added only when you accept. Swipe left or tap I understand.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

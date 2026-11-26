@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notifications</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="pop">
+    <svg class="ic m" viewBox="0 0 24 24" aria-hidden="true" style="color: #ff7a6e"><path d="M7 17v-4a5 5 0 0 1 10 0v4M5 17h14v3H5zM12 3v2.5M4.5 6.5L6.3 8.3M19.5 6.5l-1.8 1.8"/></svg>
+    <div style="flex: 1; min-width: 0">
+      <div style="font-size: 17px">Danger · München</div>
+      <div style="font-size: 15px; opacity: .8; margin-top: 2px">Rauchentwicklung durch Großbrand</div>
+    </div>
+  </div>
+
+  <div class="hdr" style="min-height: 64px">
+    <div class="hdr-t">Events</div>
+  </div>
+
+  <div class="sh">Nanünana</div>
+  <button class="li tall">
+    <div class="li-ic l3" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17v-4a5 5 0 0 1 10 0v4M5 17h14v3H5zM12 3v2.5M4.5 6.5L6.3 8.3M19.5 6.5l-1.8 1.8"/></svg></div>
+    <div class="li-b">
+      <div class="li-t">Danger · München</div>
+      <div class="li-t wrap small sec">Rauchentwicklung durch Großbrand. Integrierte Leitstelle München</div>
+      <div class="li-s">Just now</div>
+    </div>
+  </button>
+  <button class="li tall">
+    <div class="li-ic l2" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17v-4a5 5 0 0 1 10 0v4M5 17h14v3H5zM12 3v2.5M4.5 6.5L6.3 8.3M19.5 6.5l-1.8 1.8"/></svg></div>
+    <div class="li-b">
+      <div class="li-t">Warning · Augsburg</div>
+      <div class="li-t wrap small sec">Amtliche WARNUNG vor SCHNEEFALL. Deutscher Wetterdienst</div>
+      <div class="li-s">12 minutes ago</div>
+    </div>
+  </button>
+  <button class="li tall">
+    <div class="li-ic"><svg class="ic m" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></div>
+    <div class="li-b">
+      <div class="li-t">All-clear · München</div>
+      <div class="li-t wrap small sec">Entwarnung: Bombenfund in Schwabing. Polizei Bayern</div>
+      <div class="li-s">3 hours ago</div>
+    </div>
+  </button>
+  <button class="li tall">
+    <div class="li-ic err"><svg class="ic m" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg></div>
+    <div class="li-b">
+      <div class="li-t">No updates for 30 minutes</div>
+      <div class="li-t wrap small sec">Nanünana cannot reach the warning service. Warnings may be missing.</div>
+      <div class="li-s">13:35</div>
+    </div>
+  </button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>
