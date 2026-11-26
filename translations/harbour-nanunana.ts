@@ -161,7 +161,7 @@ Nanünana is not offered in the Russian Federation, in Belarus, or in territorie
     </message>
     <message id="nanunana-about-licence-text">
         <source>Free software, GPL-3.0-or-later.
-https://github.com/muhnschein/nan-nana</source>
+https://github.com/muhnschein/nanuenana</source>
         <translation type="unfinished"></translation>
     </message>
     <message id="nanunana-about-version">

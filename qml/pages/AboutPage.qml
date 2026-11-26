@@ -40,7 +40,7 @@ Page {
         {
             //% "Licence"
             "title": qsTrId("nanunana-about-licence"),
-            //% "Free software, GPL-3.0-or-later.\nhttps://github.com/muhnschein/nan-nana"
+            //% "Free software, GPL-3.0-or-later.\nhttps://github.com/muhnschein/nanuenana"
             "text": qsTrId("nanunana-about-licence-text")
         }
     ]

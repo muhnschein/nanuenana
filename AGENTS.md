@@ -35,7 +35,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 
 - Page tests (`tests/qml/tst_*.qml`) and OS file lookups (Silica QML, theme icons, sailjail profiles): SDK container, never phone.
 - Test phone: on the local SFOS test host via the harness's `local/run.sh` (`muhnschein-sfos-harness`, see its `local/README.md`); Nanünana's caller notes: its `apps/nanunana.md`. Its AGENTS.md rules every phone run (baseline, no blind taps, reboot, language, `clean_slate`); helpers: its README, `scripts/lib.sh`. Never run fork or others' PR code there: any run can root phone.
-- PR build onto phone: `install_artifact muhnschein/nan-nana RUN_ID harbour-nanunana`, RUN_ID of this PR's green CI run.
+- PR build onto phone: `install_artifact muhnschein/nanuenana RUN_ID harbour-nanunana`, RUN_ID of this PR's green CI run.
 - Every run starts from named state; `state.txt` records it plus RPM name and sha256:
   - `clean`: `reset`: quit app, drop sailjail grant, `rpm -e`, delete `~/.local/share/nanunana/nanunana`, `~/.config/nanunana/nanunana`, `~/.cache/nanunana/nanunana`; install.
   - `fixture:NAME`: `clean`, then restore data snapshot saved with `fixture_save`.

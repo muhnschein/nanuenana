@@ -5,7 +5,7 @@ Summary:    Unofficial warning app
 Version:    0.1.0
 Release:    1
 License:    GPLv3+ and MIT and ASL 2.0 and BSD and ISC and CC-BY
-URL:        https://github.com/muhnschein/nan-nana
+URL:        https://github.com/muhnschein/nanuenana
 Source0:    %{name}-%{version}.tar.bz2
 ExclusiveArch: aarch64
 
