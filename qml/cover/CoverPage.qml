@@ -106,6 +106,8 @@ CoverBackground {
             text: cover.title()
             color: cover.mode === "stale" ? Theme.errorColor : (cover.mode === "warned" && bars.lit.length > 0 ? bars.lit : Theme.highlightColor)
             font.pixelSize: Theme.fontSizeLarge
+            fontSizeMode: Text.HorizontalFit
+            minimumPixelSize: Theme.fontSizeExtraSmall
             truncationMode: TruncationMode.Fade
         }
 

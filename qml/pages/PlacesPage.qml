@@ -147,6 +147,12 @@ Page {
             menu: place !== null && !place.current ? placeMenu : null
             onClicked: pageStack.push(Qt.resolvedUrl("PlacePage.qml"), { "placeId": place.id })
 
+            function remove() {
+                var id = place.id
+                //% "Removing"
+                remorseAction(qsTrId("nanunana-place-removing"), function() { App.removePlace(id) })
+            }
+
             Column {
                 id: body
 
@@ -225,12 +231,12 @@ Page {
                     rightMargin: Theme.horizontalPageMargin
                 }
                 y: Theme.paddingMedium
-                width: Math.min(implicitWidth, row.width / 4)
+                width: Math.min(implicitWidth, row.width / 2)
                 text: Words.areaText(row.place)
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeSmall
                 horizontalAlignment: Text.AlignRight
-                wrapMode: Text.Wrap
+                truncationMode: TruncationMode.Fade
             }
 
             Component {
@@ -250,13 +256,10 @@ Page {
                     }
 
                     MenuItem {
+                        objectName: "removePlace"
                         //% "Remove"
                         text: qsTrId("nanunana-place-remove")
-                        onClicked: {
-                            var id = row.place.id
-                            //% "Removing"
-                            row.remorseAction(qsTrId("nanunana-place-removing"), function() { App.removePlace(id) })
-                        }
+                        onClicked: row.remove()
                     }
                 }
             }
@@ -279,5 +282,12 @@ Page {
         }
 
         VerticalScrollDecorator {}
+    }
+
+    Unofficial {
+        objectName: "emptyUnofficial"
+        anchors.bottom: parent.bottom
+        visible: page.places.length === 0
+        text: qsTrId("nanunana-unofficial-short")
     }
 }

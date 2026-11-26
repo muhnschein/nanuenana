@@ -77,6 +77,10 @@ fn parse_entry(line: &'static str) -> Option<Entry> {
     })
 }
 
+fn codes(entry: &Entry) -> usize {
+    entry.postcodes.split(' ').count()
+}
+
 fn rank(entry: &Entry, query: &str, digits: bool) -> Option<(u8, usize)> {
     if digits {
         let hit = entry.postcodes.split(' ').any(|code| code.starts_with(query));
@@ -142,7 +146,11 @@ impl Gazetteer {
             .iter()
             .filter_map(|entry| rank(entry, &query, digits).map(|r| (r, entry)))
             .collect();
-        hits.sort_by(|a, b| a.0.cmp(&b.0).then_with(|| a.1.name.cmp(b.1.name)));
+        hits.sort_by(|a, b| {
+            a.0.cmp(&b.0)
+                .then_with(|| a.1.name.cmp(b.1.name))
+                .then_with(|| codes(b.1).cmp(&codes(a.1)))
+        });
         hits.into_iter().take(limit).map(|(_, entry)| entry).collect()
     }
 
@@ -209,6 +217,18 @@ mod tests {
         assert_eq!(names(g.search("KÖ", 10)), vec!["Köln", "Neu-Köln"]);
         assert_eq!(names(g.search("neu", 10)), vec!["Neu-Köln"]);
         assert_eq!(names(g.search("oln", 10)), Vec::<&str>::new());
+    }
+
+    #[test]
+    fn of_two_places_with_one_name_the_one_with_more_postcodes_comes_first() {
+        let g = Gazetteer::parse(
+            "Hamburg\t01062\t53.5312\t10.1207\t22113\n\
+             Hamburg\t02000\t53.5721\t10.0138\t20095 20097 20099\n\
+             Hamburg\t03999\t53.0\t10.0\t29999 29998\n",
+            "",
+        );
+        let districts: Vec<&str> = g.search("hamb", 10).into_iter().map(|e| e.district).collect();
+        assert_eq!(districts, vec!["02000", "03999", "01062"]);
     }
 
     #[test]

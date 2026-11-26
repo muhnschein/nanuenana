@@ -8,16 +8,33 @@ Page {
     id: page
 
     property string query
-    readonly property var hits: { App.stateJson; return JSON.parse(App.search(query)) }
+
+    function refresh() {
+        var found = JSON.parse(App.search(query))
+        hits.clear()
+        for (var i = 0; i < found.length; ++i)
+            hits.append(found[i])
+    }
 
     allowedOrientations: Orientation.All
+    onQueryChanged: refresh()
+
+    ListModel {
+        id: hits
+    }
+
+    Connections {
+        target: App
+        onStateChanged: page.refresh()
+    }
 
     SilicaListView {
         id: list
 
+        objectName: "hitList"
         anchors.fill: parent
         currentIndex: -1
-        model: page.hits.length
+        model: hits
 
         header: Column {
             width: list.width
@@ -45,18 +62,16 @@ Page {
         delegate: BackgroundItem {
             id: row
 
-            readonly property var hit: page.hits[index] || null
-
             objectName: "hitRow"
             width: list.width
             height: Theme.itemSizeMedium
-            enabled: hit !== null && !hit.saved
+            enabled: !model.saved
             opacity: enabled ? 1.0 : Theme.opacityLow
             onClicked: pageStack.push(Qt.resolvedUrl("AreaDialog.qml"), {
-                "name": hit.name,
-                "district": hit.district,
-                "districtName": hit.districtName,
-                "stateName": hit.stateName,
+                "name": model.name,
+                "district": model.district,
+                "districtName": model.districtName,
+                "stateName": model.stateName,
                 "acceptDestination": pageStack.previousPage(page),
                 "acceptDestinationAction": PageStackAction.Pop
             })
@@ -73,7 +88,7 @@ Page {
                 Label {
                     objectName: "hitName"
                     width: parent.width
-                    text: row.hit !== null ? Theme.highlightText(row.hit.name, page.query, Theme.highlightColor) : ""
+                    text: Theme.highlightText(model.name, page.query, Theme.highlightColor)
                     textFormat: Text.StyledText
                     color: row.highlighted ? Theme.highlightColor : Theme.primaryColor
                     truncationMode: TruncationMode.Fade
@@ -82,7 +97,7 @@ Page {
                 Label {
                     objectName: "hitDistrict"
                     width: parent.width
-                    text: row.hit !== null ? row.hit.districtName + ", " + row.hit.stateName : ""
+                    text: model.districtName + ", " + model.stateName
                     color: row.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
                     font.pixelSize: Theme.fontSizeSmall
                     truncationMode: TruncationMode.Fade
@@ -98,7 +113,7 @@ Page {
                     verticalCenter: parent.verticalCenter
                 }
                 //% "Saved"
-                text: row.hit === null ? "" : (row.hit.saved ? qsTrId("nanunana-add-saved") : row.hit.postcode)
+                text: model.saved ? qsTrId("nanunana-add-saved") : model.postcode
                 color: Theme.secondaryColor
                 font.pixelSize: Theme.fontSizeSmall
             }
@@ -111,7 +126,7 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: page.query.length >= 2 && page.hits.length === 0
+            enabled: page.query.length >= 2 && hits.count === 0
             //% "No place found"
             text: qsTrId("nanunana-add-none")
             //% "Try the postcode, or a larger town nearby."

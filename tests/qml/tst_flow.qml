@@ -14,11 +14,14 @@ ApplicationWindow {
     property int waits
     property var places: null
     property var lastNotices: null
+    property var menuRow: null
+    property var rowMenu: null
     readonly property string fire: "mow.DE-BY-M-SE089-20261126-89-001"
     readonly property var steps: [
         openPlaces, acceptNotice, addMunich, munichListed, munichPage, fireWarning, coverWarned,
-        addCologne, cologneStale, settingsPage, aboutPage, searchPage, areaDialog, areaSaved, changeArea,
-        areaChanged, areaIsDistrict, removeAll
+        addCologne, cologneStale, settingsPage, aboutPage, searchPage, searchHit, searchSaved, searchAgain,
+        areaDialog, areaSaved, changeArea, areaChanged, areaIsDistrict, openRowMenu, removeFromMenu,
+        removedAfterRemorse, removeAll
     ]
 
     function page(name) {
@@ -82,6 +85,7 @@ ApplicationWindow {
         Probe.expect(view().noticeAccepted, "accepting the dialog records it")
         Probe.expect(pageStack.currentPage === test.places, "accepting returns to the places")
         Probe.expect(Probe.one(test.places, "placesEmpty").enabled, "no places: the hint shows")
+        Probe.expect(Probe.one(test.places, "emptyUnofficial").visible, "the empty page says it is unofficial")
         Probe.expect(App.addPlace("München", "09162", 0) === "", "München is added")
         Probe.expect(App.addPlace("München", "09162", 0) === "duplicate", "a place is added once")
         Probe.expect(App.addPlace("Nirgendwo", "09162", 0) === "unknown", "unknown places are refused")
@@ -98,6 +102,7 @@ ApplicationWindow {
         Probe.expect(place.level === 3, "München's highest level is danger: " + place.level)
         Probe.expect(place.warnings.length >= 2 && place.ended.length === 1, "München lists warnings and one all-clear")
         Probe.expect(!Probe.one(test.places, "placesEmpty").enabled, "with a place the hint is gone")
+        Probe.expect(!Probe.one(test.places, "emptyUnofficial").visible, "with a place the list's own line says it")
         Probe.expect(Probe.text(test.places, "placeName") === "München", "row name")
         Probe.expect(Probe.text(test.places, "placeHeadline") === "Rauchentwicklung durch Großbrand", "row headline: " + Probe.text(test.places, "placeHeadline"))
         Probe.expect(Probe.text(test.places, "placeArea") === qsTrId("nanunana-area-district"), "row area")
@@ -195,15 +200,39 @@ ApplicationWindow {
     }
 
     function searchPage() {
+        var field = Probe.one(pageStack.currentPage, "placeSearch")
+        Probe.expect(field.focus, "the search field starts focused")
+        field.text = "Rehlingen-S"
+    }
+
+    function searchHit() {
         var shown = pageStack.currentPage
-        shown.query = "Rehlingen-S"
-        var names = Probe.named(shown, "hitRow")
-        Probe.expect(names.length === 1, "one hit for Rehlingen-S: " + names.length)
+        Probe.one(shown, "hitList").forceLayout()
+        if (Probe.named(shown, "hitRow").length !== 1)
+            return false
         Probe.expect(Probe.text(shown, "hitDistrict") === "Landkreis Saarlouis, Saarland", "hit district: " + Probe.text(shown, "hitDistrict"))
-        shown.query = "München"
-        var rows = Probe.named(shown, "hitRow")
-        Probe.expect(rows.length > 0 && !rows[0].enabled, "a saved place cannot be added again")
-        shown.query = "Rehlingen-S"
+        Probe.expect(Probe.one(shown, "placeSearch").focus, "hits arriving leave the focus in the search field")
+        Probe.expect(Probe.one(shown, "hitList").currentIndex === -1, "no hit is made the current one")
+        Probe.one(shown, "placeSearch").text = "München"
+    }
+
+    function searchSaved() {
+        var shown = pageStack.currentPage
+        Probe.one(shown, "hitList").forceLayout()
+        var districts = Probe.texts(shown, "hitDistrict")
+        if (districts.length === 0 || districts[0] !== "Kreisfreie Stadt München, Bayern")
+            return false
+        Probe.expect(!Probe.named(shown, "hitRow")[0].enabled, "a saved place cannot be added again")
+        Probe.expect(Probe.one(shown, "placeSearch").focus, "changing hits leave the focus in the search field")
+        Probe.one(shown, "placeSearch").text = "Rehlingen-S"
+    }
+
+    function searchAgain() {
+        var shown = pageStack.currentPage
+        Probe.one(shown, "hitList").forceLayout()
+        var districts = Probe.texts(shown, "hitDistrict")
+        if (districts.length !== 1 || districts[0] !== "Landkreis Saarlouis, Saarland")
+            return false
         Probe.one(shown, "hitRow").clicked(null)
     }
 
@@ -249,6 +278,29 @@ ApplicationWindow {
         var place = placeNamed("Rehlingen-Siersburg")
         Probe.expect(place !== null && place.km === 0, "the changed area is saved")
         Probe.expect(view().places.length === 3, "changing an area adds no place")
+    }
+
+    function openRowMenu() {
+        Probe.one(test.places, "placeList").positionViewAtBeginning()
+        var rows = Probe.named(test.places, "placeRow")
+        for (var i = 0; i < rows.length; ++i) {
+            if (rows[i].place !== null && rows[i].place.name === "München")
+                test.menuRow = rows[i]
+        }
+        if (test.menuRow === null)
+            return false
+        test.rowMenu = test.menuRow.openMenu()
+    }
+
+    function removeFromMenu() {
+        Probe.one(test.rowMenu, "removePlace").clicked()
+        test.menuRow.closeMenu()
+    }
+
+    function removedAfterRemorse() {
+        if (placeNamed("München") !== null)
+            return false
+        Probe.expect(view().places.length === 2, "only the removed place is gone")
     }
 
     function removeAll() {
