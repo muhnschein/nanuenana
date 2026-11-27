@@ -1,0 +1,36 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/nanunana-core",
+    "crates/nanunana-qt",
+    "crates/harbour-nanunana",
+]
+default-members = ["crates/nanunana-core"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.95"
+license = "GPL-3.0-or-later"
+publish = false
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+
+[profile.dev]
+debug = "line-tables-only"
+incremental = false
+
+[profile.release]
+panic = "unwind"
+lto = "fat"
+codegen-units = 1
+opt-level = 3
+strip = "symbols"
+debug = false
+
+[patch.crates-io]
+qttypes = { path = "third_party/qttypes" }

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Settings</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 1500px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="hdr">
+    <div class="hdr-t">Settings</div>
+  </div>
+
+  <div class="sh">Alert me about</div>
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Civil protection</span><span class="cb-v">Information and higher</span></div>
+  </button>
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Police</span><span class="cb-v">Information and higher</span></div>
+  </button>
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Weather</span><span class="cb-v">Warning and higher</span></div>
+  </button>
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Flood</span><span class="cb-v">Warning and higher</span></div>
+    <div class="cb-x">Each can also be set to Danger and higher, Extreme danger only, or No alerts. Lower levels still show in the app.</div>
+  </button>
+  <button class="sw on">
+    <span class="sw-d"></span>
+    <span><span class="sw-t">All-clear</span><br><span class="sw-x">Tell me when a warning I was alerted about has ended.</span></span>
+  </button>
+  <button class="sw">
+    <span class="sw-d"></span>
+    <span><span class="sw-t">Every update</span><br><span class="sw-x">Off: a changed warning alerts again only when its level rises.</span></span>
+  </button>
+
+  <div class="sh">Current location</div>
+  <button class="sw on">
+    <span class="sw-d"></span>
+    <span><span class="sw-t">Warnings at your location</span><br><span class="sw-x">Shown first on the home page, with alerts like a saved place. Your position stays on this phone. Needs positioning turned on in the phone settings.</span></span>
+  </button>
+
+  <div class="sh">Checking for warnings</div>
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Check every</span><span class="cb-v">5 minutes</span></div>
+    <div class="cb-x">Also wakes the phone from sleep. 10, 15 or 30 minutes use less battery and are later.</div>
+  </button>
+  <div class="box">
+    <svg class="ic err" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+    <div>Nanünana checks only while it is open or minimised. If you close it, you get no alerts. Sailfish OS offers apps no other way.</div>
+  </div>
+  <button class="sw on">
+    <span class="sw-d"></span>
+    <span><span class="sw-t">Tell me when checking fails</span><br><span class="sw-x">One notification after 30 minutes without a successful check.</span></span>
+  </button>
+
+  <div class="sh">Warnings</div>
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Language</span><span class="cb-v">Phone language</span></div>
+    <div class="cb-x">Only translations the issuer provides. Without one the original is shown.</div>
+  </button>
+
+  <div class="sh">About</div>
+  <button class="li">
+    <div class="li-b">
+      <div class="li-t">About Nanünana</div>
+      <div class="li-s">Official channels, sources, licence</div>
+    </div>
+  </button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":1500}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

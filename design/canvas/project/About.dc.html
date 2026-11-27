@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>About</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 1240px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="hdr">
+    <div class="hdr-t">Nanünana</div>
+    <div class="hdr-d">Version 0.1.0</div>
+  </div>
+
+  <div class="tx">An unofficial app that shows official warnings for places you choose and for where you are.</div>
+
+  <div class="sh">Not an official app</div>
+  <div class="tx small">Volunteers make Nanünana. No authority runs, checks or endorses it. It can be late and it can miss a warning. In an emergency follow the official channels first.</div>
+
+  <div class="sh">Official channels in Germany</div>
+  <div class="tx small">Cell broadcast on your phone, sirens, radio and television.<br><a class="hl" href="https://warnung.bund.de">warnung.bund.de</a><br>Emergency calls: 112 (fire and rescue), 110 (police).</div>
+
+  <div class="sh">Where the warnings come from</div>
+  <div class="tx small">Bundesamt für Bevölkerungsschutz und Katastrophenhilfe (warnung.bund.de), with warnings of the civil protection authorities of the Länder and districts, the police forces of the Länder, Deutscher Wetterdienst and the Länderübergreifendes Hochwasserportal. Texts are shown unchanged.</div>
+  <div class="tx small">Place names: GeoNames, CC BY 4.0.</div>
+
+  <div class="sh">Where Nanünana is offered</div>
+  <div class="tx small">Germany. More countries follow one by one.</div>
+  <div class="tx small">Nanünana is not offered in the Russian Federation, in Belarus, or in territories under Russian control outside Russia. It is not offered in Iran, North Korea or Syria.</div>
+
+  <div class="sh">Your data</div>
+  <div class="tx small">Places, settings and your position stay on this phone. Nanünana asks warnung.bund.de for the warnings of your districts; that service sees the district, not the place or your position. No account, no tracking.</div>
+
+  <div class="sh">Licence</div>
+  <div class="tx small">Free software, GPL-3.0-or-later.<br><a class="hl" href="https://github.com/muhnschein/nanuenana">github.com/muhnschein/nanuenana</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":1240}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

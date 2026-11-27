@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Not offered here</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="hdr">
+    <div class="hdr-t">Current location</div>
+  </div>
+
+  <div class="ph" style="top: 280px">
+    <div class="ph-t">Nanünana is not offered here</div>
+    <div class="ph-h">There are no warnings for your current location, and there will be none. Your saved places elsewhere keep working.</div>
+  </div>
+
+  <div class="unoff bottom">Your location is checked on this phone only and is not sent anywhere.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

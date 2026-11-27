@@ -1,0 +1,51 @@
+{
+  "identifier": "mow.DE-BY-M-SE089-20261126-89-001",
+  "sender": "DE-BY-M-SE089",
+  "sent": "2026-11-26T14:05:00+01:00",
+  "status": "Actual",
+  "msgType": "Update",
+  "scope": "Public",
+  "code": ["DVN:1", "medien_ueberregional"],
+  "info": [
+    {
+      "language": "de",
+      "category": ["Fire"],
+      "event": "Gefahreninformation",
+      "urgency": "Immediate",
+      "severity": "Severe",
+      "certainty": "Observed",
+      "headline": "Rauchentwicklung durch Großbrand",
+      "description": "In München-Moosach brennt eine Lagerhalle.<br/>Es kommt zu starker Rauchentwicklung.",
+      "instruction": "Halten Sie Fenster und Türen geschlossen.<br/>Meiden Sie das betroffene Gebiet.",
+      "web": "https://www.muenchen.de",
+      "contact": "Bürgertelefon 089 2353-55555",
+      "parameter": [
+        {"valueName": "sender_langname", "value": "Integrierte Leitstelle München"},
+        {"valueName": "sender_signature", "value": "Integrierte Leitstelle München<br/>Landeshauptstadt München"},
+        {"valueName": "instructionCode", "value": "BBK-ISC-001 BBK-ISC-010"},
+        {"valueName": "PHGEM", "value": "1+09162000"}
+      ],
+      "area": [{"areaDesc": "München: Moosach, Milbertshofen-Am Hart"}]
+    },
+    {
+      "language": "de-LS",
+      "headline": "Es brennt. Es gibt viel Rauch.",
+      "description": "In München-Moosach brennt eine Halle.",
+      "instruction": "Machen Sie Fenster und Türen zu.",
+      "parameter": [{"valueName": "sender_langname", "value": "Integrierte Leitstelle München"}],
+      "area": [{"areaDesc": "München"}]
+    },
+    {
+      "language": "en",
+      "headline": "Smoke from a major fire",
+      "description": "A warehouse is on fire in München-Moosach.",
+      "instruction": null,
+      "senderName": "Munich control centre",
+      "parameter": [
+        {"valueName": "instructionText", "value": "Keep windows and doors closed."},
+        {"valueName": "sender_langname", "value": "Integrierte Leitstelle München"}
+      ],
+      "area": [{"areaDesc": "Munich: Moosach"}]
+    }
+  ]
+}

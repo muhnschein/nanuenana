@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Current location: position not found</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="ind-back"><i></i><i></i></div>
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">Augsburg</div>
+    <div class="hdr-d">Current location · no position since 13:05</div>
+  </div>
+
+  <div class="box">
+    <svg class="ic err" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+    <div>
+      <div class="err" style="font-size: 17px">You may be somewhere else by now</div>
+      <div style="margin-top: 4px">Nanünana has had no position since 13:05. The warnings below are for Augsburg, where you were then. Check that positioning is on in the phone settings.</div>
+    </div>
+  </div>
+  <div class="btns"><button class="btn">Try now</button></div>
+
+  <div class="sh">Augsburg, checked 14:32</div>
+  <button class="li tall">
+    <div class="li-ic l1" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" role="img" aria-label="Weather"><path d="M12 12L12 3M9.7 3.7L12 6L14.3 3.7M12 12L19.79 7.5M18.04 5.86L17.2 9L20.34 9.84M12 12L19.79 16.5M20.34 14.16L17.2 15L18.04 18.14M12 12L12 21M14.3 20.3L12 18L9.7 20.3M12 12L4.21 16.5M5.96 18.14L6.8 15L3.66 14.16M12 12L4.21 7.5M3.66 9.84L6.8 9L5.96 5.86"/></svg></div>
+    <div class="li-b">
+      <div class="li-t wrap">Amtliche WARNUNG vor FROST</div>
+      <div class="li-s">Deutscher Wetterdienst · until Fri 10:00</div>
+      <div class="lvrow l1"><span class="lv l1" role="img" aria-label="Level 1 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Information</span><span>· Weather</span></div>
+    </div>
+  </button>
+
+  <div class="unoff bottom">Unofficial display of official warnings. Follow sirens, cell broadcast and radio.</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

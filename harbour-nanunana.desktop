@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-nanunana
+Exec=harbour-nanunana
+Name=Nanünana
+Comment=Unofficial warning app
+Comment[de]=Inoffizielle Warn-App
+X-Nemo-Single-Instance=yes
+
+[X-Sailjail]
+OrganizationName=nanunana
+ApplicationName=nanunana
+Permissions=Internet;Location

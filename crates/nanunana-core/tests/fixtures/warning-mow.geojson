@@ -1,0 +1,25 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {"warnId": "mow.DE-BY-M-SE089-20261126-89-001", "strokeColor": "#FB8C00"},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [[11.49, 48.17], [11.53, 48.17], [11.53, 48.20], [11.49, 48.20], [11.49, 48.17]],
+          [[11.51, 48.181], [11.52, 48.181], [11.52, 48.19], [11.51, 48.19], [11.51, 48.181]]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {"warnId": "mow.DE-BY-M-SE089-20261126-89-001"},
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [[[[11.55, 48.20], [11.57, 48.20], [11.57, 48.22], [11.55, 48.22], [11.55, 48.20]]]]
+      }
+    },
+    {"type": "Feature", "properties": {}, "geometry": null}
+  ]
+}

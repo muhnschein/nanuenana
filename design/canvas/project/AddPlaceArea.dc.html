@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add place: area</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 400px; height: 860px">
+  <div class="dlg">
+    <button class="dlg-c">Cancel</button>
+    <button class="dlg-a">Save</button>
+  </div>
+
+  <div class="tx big hl" style="text-align: right">Rehlingen-Siersburg</div>
+  <div class="tx small hl2" style="text-align: right; padding-top: 0">Landkreis Saarlouis, Saarland</div>
+
+  <button class="cb">
+    <div class="cb-r"><span class="cb-l">Warn for</span><span class="cb-v">Around this place</span></div>
+  </button>
+
+  <div class="sl">
+    <div class="sl-v">5 km</div>
+    <div class="sl-t"><i style="width: 20%"></i><b style="left: 20%"></b></div>
+    <div class="sl-l">Distance, 1 to 25 km</div>
+  </div>
+
+  <div class="tx small sec" style="padding-top: 8px">You get every warning whose area comes within 5 km of the centre of Rehlingen-Siersburg. Warnings for the whole district or the whole Land always count.</div>
+
+  <div class="box">
+    <svg class="ic hl" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg>
+    <div>A larger distance means more warnings that do not concern you. A smaller one can miss a warning drawn tightly around a neighbouring street.</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":400,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

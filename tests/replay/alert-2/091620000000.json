@@ -1,0 +1,28 @@
+[
+  {
+    "id": "mow.DE-BY-M-SE089-20261126-89-001",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "mow.DE-BY-M-SE089-20261126-89-001",
+      "hash": "replay",
+      "data": {
+        "headline": "Rauchentwicklung durch Großbrand",
+        "provider": "MOWAS",
+        "severity": "Severe",
+        "msgType": "Alert",
+        "transKeys": {
+          "event": "BBK-EVC-010"
+        },
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Rauchentwicklung durch Großbrand"
+    },
+    "sent": "2026-11-26T13:41:00+01:00"
+  }
+]
