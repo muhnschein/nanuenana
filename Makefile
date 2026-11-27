@@ -32,10 +32,11 @@ test:
 	fi
 	python3 tools/places_test.py
 	python3 tools/untranslated_test.py
+	python3 tools/english_plurals_test.py
 	python3 tools/replay_test.py
 	python3 tools/ci/sonar_issues_test.py
 
-PY_TESTS = tools/no_comments_test.py tools/places_test.py tools/untranslated_test.py tools/replay_test.py tools/ci/sonar_issues_test.py
+PY_TESTS = tools/no_comments_test.py tools/places_test.py tools/untranslated_test.py tools/english_plurals_test.py tools/replay_test.py tools/ci/sonar_issues_test.py
 
 coverage:
 	mkdir -p coverage
