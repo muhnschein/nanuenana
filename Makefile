@@ -32,6 +32,7 @@ test:
 	fi
 	python3 tools/places_test.py
 	python3 tools/untranslated_test.py
+	python3 tools/replay_test.py
 
 MUTANTS_SHARD ?= 0/1
 MUTANTS_DIFF ?= mutants.diff

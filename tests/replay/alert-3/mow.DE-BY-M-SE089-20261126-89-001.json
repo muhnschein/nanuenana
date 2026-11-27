@@ -1,0 +1,38 @@
+{
+  "identifier": "mow.DE-BY-M-SE089-20261126-89-001",
+  "sender": "DE-BY-M-SE089",
+  "sent": "2026-11-26T16:30:00+01:00",
+  "status": "Actual",
+  "msgType": "Cancel",
+  "scope": "Public",
+  "info": [
+    {
+      "language": "de",
+      "category": [
+        "Fire"
+      ],
+      "event": "Entwarnung",
+      "urgency": "Immediate",
+      "severity": "Minor",
+      "certainty": "Observed",
+      "headline": "Entwarnung: Rauchentwicklung durch Großbrand",
+      "description": "Der Brand in München-Moosach ist gelöscht.<br/>Die Warnung ist aufgehoben.",
+      "instruction": "",
+      "parameter": [
+        {
+          "valueName": "sender_langname",
+          "value": "Integrierte Leitstelle München"
+        },
+        {
+          "valueName": "sender_signature",
+          "value": "Integrierte Leitstelle München<br/>Landeshauptstadt München"
+        }
+      ],
+      "area": [
+        {
+          "areaDesc": "München: Moosach, Milbertshofen-Am Hart"
+        }
+      ]
+    }
+  ]
+}

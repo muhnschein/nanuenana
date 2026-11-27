@@ -1,0 +1,218 @@
+[
+  {
+    "id": "dwd.replay.gewitter",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.gewitter",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Severe",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche UNWETTERWARNUNG vor SCHWEREM GEWITTER mit ORKANBÖEN und HEFTIGEM STARKREGEN"
+    },
+    "sent": "2026-11-27T06:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.schneefall",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.schneefall",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Moderate",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor SCHNEEFALL"
+    },
+    "sent": "2026-11-27T07:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.glaette",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.glaette",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Minor",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor GLÄTTE"
+    },
+    "sent": "2026-11-27T08:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.frost",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.frost",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Minor",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor FROST"
+    },
+    "sent": "2026-11-27T09:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.nebel",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.nebel",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Minor",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor NEBEL"
+    },
+    "sent": "2026-11-27T10:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.dauerregen",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.dauerregen",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Moderate",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor DAUERREGEN"
+    },
+    "sent": "2026-11-27T11:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.sturmboeen",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.sturmboeen",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Moderate",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor STURMBÖEN"
+    },
+    "sent": "2026-11-27T12:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.hitze",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.hitze",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Moderate",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor HITZE"
+    },
+    "sent": "2026-11-27T13:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  },
+  {
+    "id": "dwd.replay.tauwetter",
+    "payload": {
+      "version": 1,
+      "type": "ALERT",
+      "id": "dwd.replay.tauwetter",
+      "hash": "replay",
+      "data": {
+        "headline": null,
+        "provider": "DWD",
+        "severity": "Moderate",
+        "msgType": "Alert",
+        "area": {
+          "type": "ZGEM",
+          "data": "1+09162000"
+        }
+      }
+    },
+    "i18nTitle": {
+      "de": "Amtliche WARNUNG vor STARKEM TAUWETTER"
+    },
+    "sent": "2026-11-27T14:00:00+01:00",
+    "expires": "2026-11-28T06:00:00+01:00"
+  }
+]
