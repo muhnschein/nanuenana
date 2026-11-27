@@ -53,11 +53,12 @@ impl Notice {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct Sighting<'a> {
     pub summary: &'a Summary,
     pub place: &'a str,
     pub quiet: bool,
+    pub headline: String,
 }
 
 fn merge<'a>(sightings: &[Sighting<'a>]) -> Vec<Sighting<'a>> {
@@ -65,7 +66,7 @@ fn merge<'a>(sightings: &[Sighting<'a>]) -> Vec<Sighting<'a>> {
     for sighting in sightings {
         match merged.iter_mut().find(|m| m.summary.id == sighting.summary.id) {
             Some(known) => known.quiet = known.quiet && sighting.quiet,
-            None => merged.push(*sighting),
+            None => merged.push(sighting.clone()),
         }
     }
     merged
@@ -119,7 +120,7 @@ pub fn decide(
             version: summary.version,
             level: summary.level,
             category: summary.category,
-            headline: summary.headline.clone(),
+            headline: sighting.headline.clone(),
             place: sighting.place.to_owned(),
             alerted,
             ended,
@@ -182,6 +183,7 @@ mod tests {
             summary,
             place,
             quiet: false,
+            headline: summary.headline.clone(),
         }
     }
 
@@ -190,6 +192,7 @@ mod tests {
             summary,
             place,
             quiet: true,
+            headline: summary.headline.clone(),
         }
     }
 

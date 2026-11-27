@@ -209,6 +209,37 @@ fn the_first_check_of_a_place_is_silent_and_later_news_alert() {
 }
 
 #[test]
+fn a_notice_says_the_headline_its_row_shows() {
+    let b = bench();
+    b.engine.set_locale("en_GB");
+    b.engine.add_place("München", "09162", 0).unwrap();
+    b.net.answer("/dashboard/091620000000.json", "[]");
+    b.engine.refresh(T0);
+    b.net.munich();
+    let notices = b.engine.refresh(T0 + 5 * MINUTE);
+    let told: Vec<(&str, &str)> = notices
+        .iter()
+        .map(|n| (n.id.as_str(), n.headline.as_str()))
+        .collect();
+    let row = b.engine.view(T0 + 5 * MINUTE).places.remove(0);
+    let shown: Vec<(&str, &str)> = row
+        .warnings
+        .iter()
+        .map(|w| (w.id.as_str(), w.headline.as_str()))
+        .collect();
+    assert_eq!(told[0], (FIRE, "Smoke from a major fire"));
+    assert_eq!(told[1], (SNOW, "Amtliche WARNUNG vor SCHNEEFALL"));
+    for said in &told {
+        assert!(shown.contains(said), "{said:?} not in {shown:?}");
+    }
+    b.net.answer("/dashboard/091620000000.json", "[]");
+    let ended = b.engine.refresh(T0 + 10 * MINUTE);
+    let fire_ended = ended.iter().find(|n| n.id == FIRE).unwrap();
+    assert_eq!(fire_ended.kind, NoticeKind::Ended);
+    assert_eq!(fire_ended.headline, "Smoke from a major fire");
+}
+
+#[test]
 fn a_place_added_beside_existing_warnings_stays_silent() {
     let b = bench();
     b.net.munich();

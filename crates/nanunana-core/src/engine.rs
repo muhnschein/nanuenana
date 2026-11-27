@@ -476,16 +476,20 @@ impl Engine {
 
         let mut notices = {
             let cache = lock(&self.cache);
+            let language = state.language().to_owned();
             let sightings: Vec<Sighting> = targets
                 .iter()
                 .flat_map(|target| {
                     let quiet = !state.primed.contains(&target.id);
-                    sighted(target, &state.districts, &cache)
+                    let cache = &cache;
+                    let language = language.as_str();
+                    sighted(target, &state.districts, cache)
                         .into_iter()
                         .map(move |summary| Sighting {
                             summary,
                             place: &target.name,
                             quiet,
+                            headline: view::headline(summary, cache.get(&summary.id), language),
                         })
                 })
                 .collect();
