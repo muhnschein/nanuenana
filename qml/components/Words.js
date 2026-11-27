@@ -49,6 +49,13 @@ function levelColor(level, lightOnDark) {
     return level >= 1 && level <= 4 ? colors[level] : ""
 }
 
+function marked(text, start, length, color) {
+    if (length <= 0)
+        return text
+    var end = start + length
+    return text.substring(0, start) + "<font color=\"" + color + "\">" + text.substring(start, end) + "</font>" + text.substring(end)
+}
+
 function clock(ms) {
     return Silica.Format.formatDate(new Date(ms), Silica.Formatter.TimeValue)
 }

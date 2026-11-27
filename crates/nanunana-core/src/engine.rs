@@ -2,7 +2,7 @@
 
 use crate::alerts::{decide, failure_due, Notice, SeenMap, Sighting};
 use crate::bbk;
-use crate::gazetteer::{state_name, Gazetteer};
+use crate::gazetteer::{matched, state_name, Gazetteer};
 use crate::geo::{distance_km, Point};
 use crate::model::{Cached, Kind, Summary};
 use crate::net::Fetch;
@@ -265,7 +265,10 @@ impl Engine {
         self.gazetteer
             .search(trimmed, SEARCH_LIMIT)
             .into_iter()
-            .map(|entry| SearchHit {
+            .map(|entry| (entry, matched(entry.name, trimmed).unwrap_or_default()))
+            .map(|(entry, (match_start, match_length))| SearchHit {
+                match_start,
+                match_length,
                 name: entry.name.to_owned(),
                 district: entry.district.to_owned(),
                 district_name: self.gazetteer.district_name(entry.district).to_owned(),

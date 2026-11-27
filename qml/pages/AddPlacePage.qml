@@ -3,6 +3,7 @@ import QtQuick 2.6
 import Sailfish.Silica 1.0
 import Nanunana 1.0
 import "../components"
+import "../components/Words.js" as Words
 
 Page {
     id: page
@@ -88,7 +89,7 @@ Page {
                 Label {
                     objectName: "hitName"
                     width: parent.width
-                    text: Theme.highlightText(model.name, page.query, Theme.highlightColor)
+                    text: Words.marked(model.name, model.matchStart, model.matchLength, Theme.highlightColor)
                     textFormat: Text.StyledText
                     color: row.highlighted ? Theme.highlightColor : Theme.primaryColor
                     truncationMode: TruncationMode.Fade

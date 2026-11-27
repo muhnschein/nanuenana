@@ -8,3 +8,5 @@
 - A place that could not be updated says so and never shows "No warnings".
 - Warning texts are shown unchanged. Where the issuer provides a translation, *Settings › Language* chooses it.
 - English and German.
+- Weather warnings show an icon for their kind of weather: thunderstorm, wind, rain, snow, ice, fog or heat.
+- The place search marks the part of a name you typed, also where the name has an umlaut or ß.

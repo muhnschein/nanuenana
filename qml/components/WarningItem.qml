@@ -40,7 +40,7 @@ BackgroundItem {
 
         x: Theme.horizontalPageMargin
         y: Theme.paddingMedium
-        category: item.warning ? item.warning.category : ""
+        icon: item.warning ? item.warning.icon : ""
         level: item.warning ? item.warning.level : 0
         ended: item.cancelled
     }

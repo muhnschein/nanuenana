@@ -81,6 +81,8 @@ fn codes(entry: &Entry) -> usize {
     entry.postcodes.split(' ').count()
 }
 
+const WORD_ENDS: [char; 5] = [' ', '-', '/', '(', ','];
+
 fn rank(entry: &Entry, query: &str, digits: bool) -> Option<(u8, usize)> {
     if digits {
         let hit = entry.postcodes.split(' ').any(|code| code.starts_with(query));
@@ -90,11 +92,47 @@ fn rank(entry: &Entry, query: &str, digits: bool) -> Option<(u8, usize)> {
     if name.starts_with(query) {
         return Some((0, name.len()));
     }
-    let word_starts = name
-        .split([' ', '-', '/', '(', ','])
-        .skip(1)
-        .any(|word| word.starts_with(query));
+    let word_starts = name.split(WORD_ENDS).skip(1).any(|word| word.starts_with(query));
     word_starts.then_some((1, name.len()))
+}
+
+fn units_matching(text: &str, folded_query: &str) -> Option<usize> {
+    let mut left = folded_query;
+    let mut units = 0;
+    for c in text.chars() {
+        if left.is_empty() {
+            break;
+        }
+        let piece = fold(c.encode_utf8(&mut [0; 4]));
+        if let Some(rest) = left.strip_prefix(piece.as_str()) {
+            left = rest;
+        } else if piece.starts_with(left) {
+            left = "";
+        } else {
+            return None;
+        }
+        units += c.len_utf16();
+    }
+    left.is_empty().then_some(units)
+}
+
+pub fn matched(name: &str, query: &str) -> Option<(usize, usize)> {
+    let query = fold(query.trim());
+    if query.is_empty() {
+        return None;
+    }
+    let mut start = 0;
+    let mut word_begins = true;
+    for (at, c) in name.char_indices() {
+        if word_begins {
+            if let Some(length) = units_matching(&name[at..], &query) {
+                return Some((start, length));
+            }
+        }
+        word_begins = WORD_ENDS.contains(&c);
+        start += c.len_utf16();
+    }
+    None
 }
 
 impl Gazetteer {
@@ -217,6 +255,57 @@ mod tests {
         assert_eq!(names(g.search("KÖ", 10)), vec!["Köln", "Neu-Köln"]);
         assert_eq!(names(g.search("neu", 10)), vec!["Neu-Köln"]);
         assert_eq!(names(g.search("oln", 10)), Vec::<&str>::new());
+    }
+
+    #[test]
+    fn matched_part_of_a_name_is_found_through_case_umlauts_and_sharp_s() {
+        assert_eq!(matched("München", "mun"), Some((0, 3)));
+        assert_eq!(matched("München", " MÜNCHEN "), Some((0, 7)));
+        assert_eq!(matched("Köln", "ko"), Some((0, 2)));
+        assert_eq!(matched("Gießen", "gies"), Some((0, 4)));
+        assert_eq!(matched("Gießen", "giess"), Some((0, 4)));
+        assert_eq!(matched("Gießen", "giesse"), Some((0, 5)));
+        assert_eq!(matched("Aach", "aach"), Some((0, 4)));
+        assert_eq!(matched("Aach", "aachen"), None);
+        assert_eq!(matched("Aach", "ach"), None);
+        assert_eq!(matched("Aach", ""), None);
+        assert_eq!(matched("Aach", "  "), None);
+    }
+
+    #[test]
+    fn matched_part_may_begin_at_a_later_word_and_counts_from_the_name_start() {
+        assert_eq!(matched("Neu-Köln", "ko"), Some((4, 2)));
+        assert_eq!(matched("Bad Aachen", "aa"), Some((4, 2)));
+        assert_eq!(matched("Füssen (Allgäu)", "allga"), Some((8, 5)));
+        assert_eq!(matched("Mülheim an der Ruhr", "ruhr"), Some((15, 4)));
+        assert_eq!(matched("Weißenburg/Bayern", "bay"), Some((11, 3)));
+        assert_eq!(matched("Bad Aachen", "ba"), Some((0, 2)));
+        assert_eq!(matched("Bad Aachen", "ad"), None);
+        assert_eq!(matched("Neuss-Neu", "neu"), Some((0, 3)));
+    }
+
+    #[test]
+    fn every_name_hit_of_the_bundled_list_has_a_matched_part() {
+        let g = Gazetteer::germany();
+        for query in ["mun", "koln", "gross", "ob", "sankt", "wei", "ue", "bad "] {
+            let hits = g.search(query, 50);
+            assert!(!hits.is_empty(), "{query}");
+            for hit in hits {
+                assert!(matched(hit.name, query).is_some(), "{query}: {}", hit.name);
+            }
+        }
+    }
+
+    #[test]
+    fn no_bundled_name_holds_a_character_that_styled_text_reads_as_markup() {
+        let g = Gazetteer::germany();
+        let odd: Vec<&str> = g
+            .entries
+            .iter()
+            .map(|entry| entry.name)
+            .filter(|name| name.contains(['<', '&']))
+            .collect();
+        assert_eq!(odd, Vec::<&str>::new());
     }
 
     #[test]

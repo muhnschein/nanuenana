@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use crate::model::{Cached, Kind, Summary, Text};
+use crate::model::{Cached, Category, Kind, Summary, Text};
 use crate::text;
 use serde::Serialize;
 
@@ -9,6 +9,7 @@ use serde::Serialize;
 pub struct WarningRow {
     pub id: String,
     pub category: &'static str,
+    pub icon: &'static str,
     pub level: u8,
     pub kind: &'static str,
     pub headline: String,
@@ -51,6 +52,7 @@ pub struct View {
 pub struct WarningView {
     pub id: String,
     pub category: &'static str,
+    pub icon: &'static str,
     pub level: u8,
     pub kind: &'static str,
     pub version: u32,
@@ -80,6 +82,29 @@ pub struct SearchHit {
     pub state_name: String,
     pub postcode: String,
     pub saved: bool,
+    pub match_start: usize,
+    pub match_length: usize,
+}
+
+const WEATHER_ICONS: [(&str, &[&str]); 7] = [
+    ("storm", &["GEWITTER"]),
+    ("snow", &["SCHNEE"]),
+    ("ice", &["GLÄTTE", "GLATTEIS", "FROST"]),
+    ("fog", &["NEBEL"]),
+    ("rain", &["REGEN"]),
+    ("wind", &["BÖEN", "STURM", "ORKAN", "WIND"]),
+    ("heat", &["HITZE", "UV-"]),
+];
+
+pub fn icon(category: Category, headline: &str) -> &'static str {
+    if category != Category::Weather {
+        return category.key();
+    }
+    let loud = headline.to_uppercase();
+    WEATHER_ICONS
+        .iter()
+        .find(|(_, words)| words.iter().any(|word| loud.contains(word)))
+        .map_or("weather", |(name, _)| name)
 }
 
 pub fn kind_key(kind: Kind) -> &'static str {
@@ -100,6 +125,7 @@ pub fn row(summary: &Summary, cached: Option<&Cached>, language: &str) -> Warnin
     WarningRow {
         id: summary.id.clone(),
         category: summary.category.key(),
+        icon: icon(summary.category, &summary.headline),
         level: summary.level.number(),
         kind: kind_key(summary.kind),
         headline,
@@ -135,6 +161,7 @@ pub fn warning(summary: &Summary, cached: Option<&Cached>, language: &str) -> Wa
     WarningView {
         id: base.id,
         category: base.category,
+        icon: base.icon,
         level: base.level,
         kind: base.kind,
         version: summary.version,
@@ -171,7 +198,7 @@ pub fn sort_rows(rows: &mut [WarningRow]) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::model::{Category, Detail, Level};
+    use crate::model::{Detail, Level};
 
     fn summary() -> Summary {
         Summary {
@@ -222,6 +249,7 @@ mod tests {
             WarningRow {
                 id: "mow.a".to_owned(),
                 category: "civil",
+                icon: "civil",
                 level: 3,
                 kind: "update",
                 headline: "Kurz".to_owned(),
@@ -292,6 +320,90 @@ mod tests {
     }
 
     #[test]
+    fn weather_icon_follows_the_kind_of_weather_in_the_issuers_headline() {
+        let cases = [
+            ("Amtliche WARNUNG vor GEWITTER", "storm"),
+            ("Amtliche WARNUNG vor SCHNEEFALL", "snow"),
+            ("Amtliche WARNUNG vor SCHNEEVERWEHUNG", "snow"),
+            ("Amtliche WARNUNG vor GLÄTTE", "ice"),
+            ("Amtliche UNWETTERWARNUNG vor GLATTEIS", "ice"),
+            ("Amtliche WARNUNG vor STRENGEM FROST", "ice"),
+            ("Amtliche WARNUNG vor NEBEL", "fog"),
+            ("Amtliche WARNUNG vor DAUERREGEN", "rain"),
+            ("Amtliche WARNUNG vor BÖEN", "wind"),
+            ("Amtliche WARNUNG vor STURM", "wind"),
+            ("Amtliche WARNUNG vor ORKAN", "wind"),
+            ("Amtliche WARNUNG vor STARKWIND", "wind"),
+            ("Amtliche WARNUNG vor HITZE", "heat"),
+            ("Amtliche WARNUNG vor erhöhter UV-Intensität", "heat"),
+            ("Amtliche Warnung vor Glätte", "ice"),
+            ("Amtliche WARNUNG vor TAUWETTER", "weather"),
+            ("", "weather"),
+        ];
+        for (headline, wanted) in cases {
+            assert_eq!(icon(Category::Weather, headline), wanted, "{headline}");
+        }
+    }
+
+    #[test]
+    fn of_two_kinds_of_weather_in_one_headline_the_more_telling_icon_wins() {
+        let cases = [
+            (
+                "Amtliche UNWETTERWARNUNG vor SCHWEREM GEWITTER mit ORKANBÖEN und STARKREGEN",
+                "storm",
+            ),
+            ("Amtliche WARNUNG vor SCHNEEFALL und WINDBÖEN", "snow"),
+            ("Amtliche WARNUNG vor GLATTEIS durch gefrierenden REGEN", "ice"),
+            ("Amtliche WARNUNG vor NEBEL und REGEN", "fog"),
+            ("Amtliche WARNUNG vor STARKREGEN und STURMBÖEN", "rain"),
+            ("Amtliche WARNUNG vor WIND und HITZE", "wind"),
+        ];
+        for (headline, wanted) in cases {
+            assert_eq!(icon(Category::Weather, headline), wanted, "{headline}");
+        }
+    }
+
+    #[test]
+    fn other_categories_keep_their_own_icon_whatever_the_headline_says() {
+        assert_eq!(icon(Category::Civil, "Sturmflut"), "civil");
+        assert_eq!(icon(Category::Police, "GEWITTER"), "police");
+        assert_eq!(icon(Category::Flood, "Hochwasser nach DAUERREGEN"), "flood");
+    }
+
+    #[test]
+    fn every_icon_name_has_its_picture_in_the_app() {
+        let icons = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../qml/icons");
+        let categories = [
+            Category::Civil,
+            Category::Police,
+            Category::Weather,
+            Category::Flood,
+        ];
+        let names = categories
+            .into_iter()
+            .map(Category::key)
+            .chain(WEATHER_ICONS.iter().map(|(name, _)| *name));
+        for name in names {
+            let picture = icons.join(format!("cat-{name}.svg"));
+            assert!(picture.is_file(), "{}", picture.display());
+        }
+    }
+
+    #[test]
+    fn rows_and_warning_views_carry_the_icon_of_the_summary_headline() {
+        let snow = Summary {
+            category: Category::Weather,
+            headline: "Amtliche WARNUNG vor SCHNEEFALL".to_owned(),
+            ..summary()
+        };
+        let c = cached(2);
+        assert_eq!(row(&snow, None, "de").icon, "snow");
+        assert_eq!(row(&snow, Some(&c), "en").icon, "snow");
+        assert_eq!(warning(&snow, Some(&c), "en").icon, "snow");
+        assert_eq!(warning(&summary(), None, "de").icon, "civil");
+    }
+
+    #[test]
     fn kinds_have_keys() {
         assert_eq!(
             [Kind::Alert, Kind::Update, Kind::Cancel].map(kind_key),
@@ -304,6 +416,7 @@ mod tests {
         let make = |id: &str, level: u8, sent_ms: i64| WarningRow {
             id: id.to_owned(),
             category: "civil",
+            icon: "civil",
             level,
             kind: "alert",
             headline: String::new(),

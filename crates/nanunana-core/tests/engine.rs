@@ -483,6 +483,22 @@ fn search_lists_places_and_marks_saved_ones() {
 }
 
 #[test]
+fn search_hits_say_which_part_of_the_name_matched() {
+    let b = bench();
+    let plain = b.engine.search("munch");
+    assert_eq!(plain[0].name, "München");
+    assert_eq!((plain[0].match_start, plain[0].match_length), (0, 5));
+    let later_word = b.engine.search(" siersb ");
+    let hit = later_word
+        .iter()
+        .find(|h| h.name == "Rehlingen-Siersburg")
+        .unwrap();
+    assert_eq!((hit.match_start, hit.match_length), (10, 6));
+    let by_code = b.engine.search("80331");
+    assert_eq!((by_code[0].match_start, by_code[0].match_length), (0, 0));
+}
+
+#[test]
 fn current_location_is_off_until_switched_on() {
     let b = bench();
     assert!(!b.engine.set_position(48.37, 10.90, T0));

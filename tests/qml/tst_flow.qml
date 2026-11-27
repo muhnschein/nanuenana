@@ -36,6 +36,18 @@ ApplicationWindow {
         return JSON.parse(App.settingsJson)
     }
 
+    function iconOf(rows, headline) {
+        for (var i = 0; i < rows.length; ++i) {
+            if (Probe.text(rows[i], "warningHeadline") === headline)
+                return String(Probe.one(rows[i], "categoryIcon").source).split("/").pop()
+        }
+        return "<no row " + headline + ">"
+    }
+
+    function marked(before, hit, after) {
+        return before + "<font color=\"" + Theme.highlightColor + "\">" + hit + "</font>" + after
+    }
+
     function placeNamed(name) {
         var list = view().places
         for (var i = 0; i < list.length; ++i) {
@@ -119,6 +131,13 @@ ApplicationWindow {
         Probe.expect(Probe.named(shown, "endedRow").length === 1, "one ended row")
         var headlines = Probe.texts(shown, "warningHeadline")
         Probe.expect(headlines[0] === "Rauchentwicklung durch Großbrand", "the highest level comes first: " + headlines[0])
+        Probe.expect(iconOf(rows, "Rauchentwicklung durch Großbrand") === "cat-civil.svg", "civil icon: " + iconOf(rows, "Rauchentwicklung durch Großbrand"))
+        Probe.expect(iconOf(rows, "Amtliche WARNUNG vor SCHNEEFALL") === "cat-snow.svg", "a snow warning shows the snow icon: " + iconOf(rows, "Amtliche WARNUNG vor SCHNEEFALL"))
+        Probe.expect(iconOf(rows, "Hochwasserinformation") === "cat-flood.svg", "flood icon: " + iconOf(rows, "Hochwasserinformation"))
+        Probe.expect(iconOf(Probe.named(shown, "endedRow"), "Entwarnung: Bombenfund in Schwabing") === "all-clear.svg", "an ended warning shows the all-clear icon")
+        var nameless = Qt.createComponent(Qt.resolvedUrl("../../qml/components/CategoryIcon.qml")).createObject(test)
+        Probe.expect(String(nameless.source).split("/").pop() === "cat-civil.svg", "an icon without a name is the civil one: " + nameless.source)
+        nameless.destroy()
         Probe.expect(!Probe.one(shown, "staleBox").visible, "an up-to-date place shows no stale box")
         Probe.expect(!Probe.one(shown, "placeClear").enabled, "a warned place is not called clear")
         Probe.expect(Probe.text(shown, "placeFooter").length > 0, "the footer says it is unofficial")
@@ -213,7 +232,8 @@ ApplicationWindow {
         Probe.expect(Probe.text(shown, "hitDistrict") === "Landkreis Saarlouis, Saarland", "hit district: " + Probe.text(shown, "hitDistrict"))
         Probe.expect(Probe.one(shown, "placeSearch").focus, "hits arriving leave the focus in the search field")
         Probe.expect(Probe.one(shown, "hitList").currentIndex === -1, "no hit is made the current one")
-        Probe.one(shown, "placeSearch").text = "München"
+        Probe.expect(Probe.text(shown, "hitName") === marked("", "Rehlingen-S", "iersburg"), "the typed part of the name is marked: " + Probe.text(shown, "hitName"))
+        Probe.one(shown, "placeSearch").text = "munch"
     }
 
     function searchSaved() {
@@ -223,8 +243,9 @@ ApplicationWindow {
         if (districts.length === 0 || districts[0] !== "Kreisfreie Stadt München, Bayern")
             return false
         Probe.expect(!Probe.named(shown, "hitRow")[0].enabled, "a saved place cannot be added again")
+        Probe.expect(Probe.texts(shown, "hitName")[0] === marked("", "Münch", "en"), "typed without umlaut, the part with umlaut is marked: " + Probe.texts(shown, "hitName")[0])
         Probe.expect(Probe.one(shown, "placeSearch").focus, "changing hits leave the focus in the search field")
-        Probe.one(shown, "placeSearch").text = "Rehlingen-S"
+        Probe.one(shown, "placeSearch").text = "siersb"
     }
 
     function searchAgain() {
@@ -233,6 +254,7 @@ ApplicationWindow {
         var districts = Probe.texts(shown, "hitDistrict")
         if (districts.length !== 1 || districts[0] !== "Landkreis Saarlouis, Saarland")
             return false
+        Probe.expect(Probe.text(shown, "hitName") === marked("Rehlingen-", "Siersb", "urg"), "a later word of the name is marked where it stands: " + Probe.text(shown, "hitName"))
         Probe.one(shown, "hitRow").clicked(null)
     }
 
