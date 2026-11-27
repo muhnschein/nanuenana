@@ -81,10 +81,12 @@ class Record(unittest.TestCase):
 
     def test_a_bad_district_or_a_missing_dashboard_is_refused(self):
         for district in ("9162", "091620", "0916a", "../09162", "", "٠٩١٦٢"):
+            net = Anything()
             with self.assertRaises(replay.Refused, msg=district):
-                replay.record([district], Anything())
+                replay.record([district], net)
+        net = Net({})
         with self.assertRaises(replay.Refused):
-            replay.record(["09162"], Net({}))
+            replay.record(["09162"], net)
 
 
 WARNING = {
@@ -139,8 +141,9 @@ class Archive(unittest.TestCase):
             "bad identifier": {f"{BASE}/archive.mowas/x_1.json": b'{"identifier": "../x"}'},
         }
         for name, answers in cases.items():
+            net = Net(answers)
             with self.assertRaises(replay.Refused, msg=name):
-                replay.archive("03403", "x_1", Net(answers))
+                replay.archive("03403", "x_1", net)
         warning = json.dumps(WARNING).encode()
         for archive_id in ("../x", ".x", "a/b", ""):
             net = Net({f"{BASE}/archive.mowas/{archive_id}.json": warning})

@@ -93,8 +93,9 @@ class Fill(unittest.TestCase):
         bare = HEAD.replace(' language="en"', "")
         out, _, _ = plurals.fill(bare + TAIL)
         self.assertEqual(out, HEAD + TAIL)
+        german = HEAD.replace('"en"', '"de"') + TAIL
         with self.assertRaisesRegex(ValueError, 'must be language="en"'):
-            plurals.fill(HEAD.replace('"en"', '"de"') + TAIL)
+            plurals.fill(german)
         with self.assertRaisesRegex(ValueError, "not a TS catalogue"):
             plurals.fill("<xml/>")
 
