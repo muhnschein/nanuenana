@@ -9,7 +9,7 @@ LUPDATE ?= lupdate
 LUPDATE_ARGS = -silent -locations none -no-obsolete
 TMP = $${TMPDIR:-/tmp}
 
-.PHONY: translations translations-check comments-check check fmt-check clippy test mutants mutants-diff mutants-paths rpm check-rpm clean
+.PHONY: translations translations-check comments-check check fmt-check clippy test coverage clippy-report mutants mutants-diff mutants-paths rpm check-rpm clean
 
 check: fmt-check comments-check translations-check clippy test
 
@@ -32,6 +32,20 @@ test:
 	fi
 	python3 tools/places_test.py
 	python3 tools/untranslated_test.py
+	python3 tools/ci/sonar_issues_test.py
+
+PY_TESTS = tools/no_comments_test.py tools/places_test.py tools/untranslated_test.py tools/ci/sonar_issues_test.py
+
+coverage:
+	mkdir -p coverage
+	QT_QPA_PLATFORM=offscreen $(CARGO) llvm-cov --workspace --lcov --output-path coverage/lcov.info
+	$(RM) coverage/python.data
+	for t in $(PY_TESTS); do python3 -m coverage run --append --data-file=coverage/python.data --include='tools/*' $$t || exit 1; done
+	python3 -m coverage xml --data-file=coverage/python.data -o coverage/python.xml
+
+clippy-report:
+	mkdir -p coverage
+	$(CARGO) clippy --workspace --all-targets --message-format=json > coverage/clippy.json
 
 MUTANTS_SHARD ?= 0/1
 MUTANTS_DIFF ?= mutants.diff
@@ -75,4 +89,4 @@ translations-check:
 
 clean:
 	$(CARGO) clean
-	$(RM) -r mutants.out RPMS prebuilt build-sdk-cross
+	$(RM) -r coverage mutants.out RPMS prebuilt build-sdk-cross
