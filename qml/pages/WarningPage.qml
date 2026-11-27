@@ -53,6 +53,11 @@ Page {
                 description: page.warning !== null ? page.warning.place : ""
             }
 
+            TestData {
+                objectName: "testData"
+                view: JSON.parse(App.stateJson)
+            }
+
             Row {
                 x: Theme.horizontalPageMargin
                 height: Math.max(bars.height, words.height) + Theme.paddingMedium

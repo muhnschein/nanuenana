@@ -79,6 +79,7 @@ ApplicationWindow {
     }
 
     function openPlaces() {
+        Probe.expect(view().replay === false, "a start without the replay variable is no replay")
         Probe.expect(!view().noticeAccepted, "first start: notice not accepted")
         Probe.expect(view().places.length === 0, "first start: no places")
         Probe.expect(App.setSetting("language", JSON.stringify("de")), "warning language set")
@@ -119,6 +120,7 @@ ApplicationWindow {
         Probe.expect(Probe.text(test.places, "placeHeadline") === "Rauchentwicklung durch Großbrand", "row headline: " + Probe.text(test.places, "placeHeadline"))
         Probe.expect(Probe.text(test.places, "placeArea") === qsTrId("nanunana-area-district"), "row area")
         Probe.expect(Probe.one(test.places, "placeLevel").level === 3, "row level")
+        Probe.expect(!Probe.one(test.places, "testData").visible, "real warnings on the places carry no test-data box")
         pageStack.push(page("PlacePage"), { "placeId": place.id }, PageStackAction.Immediate)
     }
 
@@ -139,6 +141,7 @@ ApplicationWindow {
         Probe.expect(String(nameless.source).split("/").pop() === "cat-civil.svg", "an icon without a name is the civil one: " + nameless.source)
         nameless.destroy()
         Probe.expect(!Probe.one(shown, "staleBox").visible, "an up-to-date place shows no stale box")
+        Probe.expect(!Probe.one(shown, "testData").visible, "real warnings of a place carry no test-data box")
         Probe.expect(!Probe.one(shown, "placeClear").enabled, "a warned place is not called clear")
         Probe.expect(Probe.text(shown, "placeFooter").length > 0, "the footer says it is unofficial")
         pageStack.push(page("WarningPage"), { "warningId": test.fire }, PageStackAction.Immediate)
@@ -153,7 +156,8 @@ ApplicationWindow {
         Probe.expect(description.indexOf("Lagerhalle") >= 0 && description.indexOf("<") < 0, "description as plain text: " + description)
         Probe.expect(Probe.text(shown, "warningInstruction").indexOf("Fenster") >= 0, "instruction shown")
         Probe.expect(!Probe.one(shown, "warningGone").enabled, "a listed warning is not gone")
-        Probe.expect(Probe.text(shown, "noteText").length > 0, "the unofficial note shows")
+        Probe.expect(Probe.text(Probe.one(shown, "warningNote"), "noteText").length > 0, "the unofficial note shows")
+        Probe.expect(!Probe.one(shown, "testData").visible, "a real warning carries no test-data box")
         backToPlaces()
         pageStack.push(coverHost, {}, PageStackAction.Immediate)
     }
@@ -163,6 +167,12 @@ ApplicationWindow {
         Probe.expect(Probe.text(shown, "coverTitle") === qsTrId("nanunana-level-danger"), "cover level: " + Probe.text(shown, "coverTitle"))
         Probe.expect(Probe.text(shown, "coverFirst") === "München", "cover place")
         Probe.expect(Probe.text(shown, "coverSecond") === "Rauchentwicklung durch Großbrand", "cover headline")
+        Probe.expect(!Probe.one(shown, "coverTestData").visible, "the cover of real warnings carries no test-data line")
+        var notifier = Qt.createComponent(Qt.resolvedUrl("../../qml/components/Notifier.qml")).createObject(test)
+        notifier.announce([{ "kind": "new", "level": 3, "place": "München", "id": test.fire, "headline": "Rauchentwicklung durch Großbrand" }])
+        var note = notifier.notes[test.fire]
+        Probe.expect(note && note.summary === qsTrId("nanunana-level-danger") + " · München", "a real notification is titled level and place: " + (note ? note.summary : "none"))
+        notifier.destroy()
         backToPlaces()
     }
 

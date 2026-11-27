@@ -10,3 +10,4 @@
 - English and German.
 - Weather warnings show an icon for their kind of weather: thunderstorm, wind, rain, snow, ice, fog or heat.
 - The place search marks the part of a name you typed, also where the name has an umlaut or ß.
+- For testing, the app can be started on recorded answers instead of the live service. It then says "Test data" on every page, on the cover and in every notification.

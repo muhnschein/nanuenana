@@ -77,18 +77,20 @@ if sb2 -t "$TARGET" ldd /usr/bin/harbour-nanunana | grep 'not found'; then
 fi
 
 data="$PWD/tests/qml/data"
-qml_files=$(find "$PWD/tests/qml" \( -path '*/canary' -o -path '*/data' \) -prune -o -name 'tst_*.qml' -print | sort)
+qml_files=$(find "$PWD/tests/qml" \( -path '*/canary' -o -path '*/data' -o -path '*/replay' \) -prune -o -name 'tst_*.qml' -print | sort)
+replay_files=$(find "$PWD/tests/qml/replay" -name 'tst_*.qml' -print | sort)
 rm -rf "$PWD/qml"
 cp -r "/srv/mer/targets/$TARGET/usr/share/harbour-nanunana/qml" "$PWD/qml"
 shipped=$(cd "/srv/mer/targets/$TARGET" && find usr/share/harbour-nanunana/qml -name '*.qml' | sort | sed 's|^|/|')
 share="$PWD/.qml-share"
 rm -rf "$share"
 mkdir -p "$share"
+started_as=
 qml_check() {
     h=$1
     shift
     mkdir -p "$h"
-    sb2 -t "$TARGET" dbus-run-session -- env HOME="$h" QT_QPA_PLATFORM=minimal \
+    sb2 -t "$TARGET" dbus-run-session -- env HOME="$h" QT_QPA_PLATFORM=minimal $started_as \
         /usr/bin/harbour-nanunana --qml-check -I /usr/share/harbour-nanunana/qml \
         -T /usr/share/harbour-nanunana/translations -D "$data" "$@"
 }
@@ -99,6 +101,14 @@ for file in $qml_files; do
     qml_check "$share/$n.home" "$file" || fail "page test $file"
 done
 [ "$n" -gt 0 ] || fail "no page tests found"
+started_as=NANUNANA_REPLAY=check
+r=0
+for file in $replay_files; do
+    r=$((r + 1))
+    qml_check "$share/replay-$r.home" "$file" || fail "replay page test $file"
+done
+started_as=
+[ "$r" -gt 0 ] || fail "no replay page tests found"
 if qml_check "$share/canary.home" "$PWD/tests/qml/canary/tst_must_fail.qml" > "$share/canary.log" 2>&1; then
     cat "$share/canary.log"
     fail "QML check passed the canary test that reports a failure"

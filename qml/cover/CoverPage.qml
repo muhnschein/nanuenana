@@ -86,6 +86,16 @@ CoverBackground {
         }
         spacing: Theme.paddingSmall
 
+        Label {
+            objectName: "coverTestData"
+            width: parent.width
+            visible: Words.replaying(cover.view)
+            text: Words.testData()
+            color: Theme.errorColor
+            font.pixelSize: Theme.fontSizeSmall
+            truncationMode: TruncationMode.Fade
+        }
+
         LevelBars {
             id: bars
 

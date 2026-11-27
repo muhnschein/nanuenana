@@ -545,5 +545,13 @@ https://github.com/muhnschein/nanuenana</translation>
         <source>It has ended or no longer concerns your places.</source>
         <translation>Sie ist beendet oder betrifft deine Orte nicht mehr.</translation>
     </message>
+    <message id="nanunana-test-data-text">
+        <source>These are not real warnings.</source>
+        <translation>Das sind keine echten Warnungen.</translation>
+    </message>
+    <message id="nanunana-test-data">
+        <source>Test data</source>
+        <translation>Testdaten</translation>
+    </message>
 </context>
 </TS>

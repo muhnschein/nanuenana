@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 import QtQuick 2.6
 import Nemo.Notifications 1.0
+import Nanunana 1.0
 import "Words.js" as Words
 
 Item {
@@ -22,11 +23,12 @@ Item {
     }
 
     function announce(notices) {
+        var replay = Words.replaying(JSON.parse(App.stateJson))
         for (var i = 0; i < notices.length; ++i)
-            notifier.publish(notices[i])
+            notifier.publish(notices[i], replay)
     }
 
-    function publish(notice) {
+    function publish(notice, replay) {
         var key = notice.kind === "failure" ? "failure" : notice.id
         var note = notifier.notes[key]
         if (!note) {
@@ -35,7 +37,7 @@ Item {
                 return
             notifier.notes[key] = note
         }
-        note.summary = Words.noticeTitle(notice)
+        note.summary = Words.noticeTitle(notice, replay)
         note.body = Words.noticeBody(notice)
         note.previewSummary = note.summary
         note.previewBody = note.body

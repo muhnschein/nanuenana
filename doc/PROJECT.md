@@ -81,7 +81,7 @@ Phone tests need warnings on demand; service has none to order. Same RPM tested 
 - Start with `NANUNANA_REPLAY=NAME` → answers from `<data>/replay/NAME/`, no socket. Files named as service names them: `{district}0000000.json`, `{id}.json`, `{id}.geojson`.
 - Own state in `<data>/replay/NAME/state`: real places, settings, seen warnings untouched.
 - Name: letters, digits, `-`, `_`, at most 40. Other value or missing folder → every check fails, shown as failed. Never falls back to live service, never "No warnings".
-- View says `replay`; pages must say test data wherever warnings show.
+- Replay never looks real: box "Test data · These are not real warnings." on places, place, warning; first cover line; every notification title starts "Test data ·".
 - Next state = swap files of the set, then check again (new warning, update, all-clear).
 - Sets in `tests/replay/`, not in RPM; pushed to phone by test run. `weather` (one warning per weather icon), `alert-1` → `alert-2` → `alert-3` (nothing, new fire warning, its all-clear): made up, in service's format, issuer texts invented.
 - Real answers: `tools/replay.py record SET DISTRICT...` (dashboards plus detail and area, bytes as sent), `tools/replay.py archive SET DISTRICT ARCHIVE_ID` (past MoWaS warning from `archive.mowas`, dashboard entry composed from it). Run where `warnung.bund.de` is reachable.

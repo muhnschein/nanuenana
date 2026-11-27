@@ -122,6 +122,11 @@ Page {
                 }
             }
 
+            TestData {
+                objectName: "testData"
+                view: page.view
+            }
+
             Label {
                 objectName: "locationNote"
                 x: Theme.horizontalPageMargin

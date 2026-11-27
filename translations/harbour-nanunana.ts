@@ -538,5 +538,13 @@ https://github.com/muhnschein/nanuenana</source>
         <source>It has ended or no longer concerns your places.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message id="nanunana-test-data-text">
+        <source>These are not real warnings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message id="nanunana-test-data">
+        <source>Test data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

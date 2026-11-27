@@ -98,7 +98,16 @@ function areaText(place) {
     return qsTrId("nanunana-area-km").arg(place.km)
 }
 
-function noticeTitle(notice) {
+function replaying(view) {
+    return view !== null && view.replay === true
+}
+
+function testData() {
+    //% "Test data"
+    return qsTrId("nanunana-test-data")
+}
+
+function realTitle(notice) {
     if (notice.kind === "failure") {
         //% "No updates for 30 minutes"
         return qsTrId("nanunana-note-failure-title")
@@ -106,6 +115,10 @@ function noticeTitle(notice) {
     //% "All-clear"
     var word = notice.kind === "ended" ? qsTrId("nanunana-all-clear") : levelName(notice.level)
     return notice.place.length > 0 ? word + " · " + notice.place : word
+}
+
+function noticeTitle(notice, replay) {
+    return replay ? testData() + " · " + realTitle(notice) : realTitle(notice)
 }
 
 function noticeBody(notice) {

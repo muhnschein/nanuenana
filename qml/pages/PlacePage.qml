@@ -93,6 +93,11 @@ Page {
                 description: page.description()
             }
 
+            TestData {
+                objectName: "testData"
+                view: page.view
+            }
+
             NoteBox {
                 objectName: "lostBox"
                 visible: page.lost

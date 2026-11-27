@@ -39,6 +39,7 @@ Item {
         y: Theme.paddingMedium
 
         Label {
+            objectName: "noteTitle"
             width: parent.width
             visible: box.title.length > 0
             text: box.title
