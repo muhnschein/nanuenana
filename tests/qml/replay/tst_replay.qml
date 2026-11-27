@@ -63,6 +63,7 @@ ApplicationWindow {
 
     function addMunich() {
         boxSaysTestData(test.places, "places without a place")
+        Probe.expect(Probe.emptyTextTop(test.places) === "clear", "the empty text starts below the test-data box: " + Probe.emptyTextTop(test.places))
         Probe.expect(App.addPlace("München", "09162", 0) === "", "München is added")
         App.check()
     }

@@ -108,6 +108,7 @@ Page {
         }
 
         header: Column {
+            objectName: "placesHead"
             width: list.width
 
             PageHeader {
@@ -280,6 +281,7 @@ Page {
         ViewPlaceholder {
             objectName: "placesEmpty"
             enabled: page.places.length === 0
+            verticalOffset: Math.max(0, (list.headerItem ? list.headerItem.height : 0) - (page.height / 3 - height / 2))
             //% "No places yet"
             text: qsTrId("nanunana-places-empty")
             //% "Pull down to add a place. Warnings at your current location can be turned on in Settings. Without either you get no alerts."

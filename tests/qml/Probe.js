@@ -39,3 +39,28 @@ function text(root, name) {
 function texts(root, name) {
     return named(root, name).map(function (item) { return String(item.text) })
 }
+
+function emptyTextTop(shown) {
+    var hint = one(shown, "placesEmpty")
+    var head = one(shown, "placesHead")
+    if (!hint || !head)
+        return "<no empty text or header>"
+    var top = hint.mapToItem(shown, 0, 0).y
+    var free = Math.max(head.mapToItem(shown, 0, head.height).y, shown.height / 3 - hint.height / 2)
+    return Math.abs(top - free) < 1 && head.height > 0 && hint.height > 0 ? "clear" : "at " + top + ", free from " + free
+}
+
+function coverRoom(cover, lines) {
+    var second = one(cover, "coverSecond")
+    var more = one(cover, "coverMore")
+    if (!second || !more || !more.visible || second.lineCount < 1)
+        return null
+    var line = second.height / second.lineCount
+    cover.actionsHeight = 2 * line
+    cover.height = second.mapToItem(cover, 0, 0).y + lines * line + more.height + second.parent.spacing + cover.actionsHeight
+    return {
+        "lines": second.lineCount,
+        "cut": second.truncated,
+        "clear": more.mapToItem(cover, 0, more.height).y <= cover.height - cover.actionsHeight
+    }
+}

@@ -98,6 +98,7 @@ ApplicationWindow {
         Probe.expect(view().noticeAccepted, "accepting the dialog records it")
         Probe.expect(pageStack.currentPage === test.places, "accepting returns to the places")
         Probe.expect(Probe.one(test.places, "placesEmpty").enabled, "no places: the hint shows")
+        Probe.expect(Probe.emptyTextTop(test.places) === "clear", "the hint starts below the header: " + Probe.emptyTextTop(test.places))
         Probe.expect(Probe.one(test.places, "emptyUnofficial").visible, "the empty page says it is unofficial")
         Probe.expect(App.addPlace("München", "09162", 0) === "", "München is added")
         Probe.expect(App.addPlace("München", "09162", 0) === "duplicate", "a place is added once")
@@ -173,7 +174,27 @@ ApplicationWindow {
         var note = notifier.notes[test.fire]
         Probe.expect(note && note.summary === qsTrId("nanunana-level-danger") + " · München", "a real notification is titled level and place: " + (note ? note.summary : "none"))
         notifier.destroy()
+        coverKeepsClearOfItsActions(shown)
         backToPlaces()
+    }
+
+    function coverKeepsClearOfItsActions(shown) {
+        var cover = Probe.one(shown, "cover")
+        var second = Probe.one(shown, "coverSecond")
+        cover.anchors.fill = undefined
+        cover.width = 4 * Theme.paddingLarge
+        var most = Probe.coverRoom(cover, 5)
+        if (!Probe.expect(most !== null && most.lines === 3 && most.cut && most.clear, "a headline longer than three lines is cut after three: " + JSON.stringify(most)))
+            return
+        for (var n = 3; n >= 1; --n) {
+            var barely = Probe.coverRoom(cover, n + 0.1)
+            Probe.expect(barely.lines === n && barely.cut && barely.clear, "room for just " + n + " lines above the actions: " + JSON.stringify(barely))
+            var almost = Probe.coverRoom(cover, n + 0.9)
+            Probe.expect(almost.lines === n && almost.cut && almost.clear, "room for not quite " + (n + 1) + " lines above the actions: " + JSON.stringify(almost))
+        }
+        var none = Probe.coverRoom(cover, 0.5)
+        Probe.expect(none.lines === 1, "with no room the headline keeps one line: " + JSON.stringify(none))
+        Probe.expect(second.maximumLineCount === 1, "one line is the least: " + second.maximumLineCount)
     }
 
     function addCologne() {
@@ -348,6 +369,7 @@ ApplicationWindow {
 
         Page {
             CoverPage {
+                objectName: "cover"
                 anchors.fill: parent
             }
         }

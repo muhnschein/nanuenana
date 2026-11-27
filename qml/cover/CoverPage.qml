@@ -11,6 +11,7 @@ CoverBackground {
     readonly property var view: JSON.parse(App.stateJson)
     readonly property var summary: Words.summary(view)
     readonly property double nowMs: { App.stateJson; return Date.now() }
+    property real actionsHeight: coverActionArea ? coverActionArea.height : 0
     readonly property string mode: {
         if (summary.places === 0)
             return "empty"
@@ -75,7 +76,15 @@ CoverBackground {
         return qsTrId("nanunana-cover-more", summary.warnings - 1)
     }
 
+    FontMetrics {
+        id: secondLine
+
+        font: second.font
+    }
+
     Column {
+        id: lines
+
         anchors {
             top: parent.top
             topMargin: Theme.paddingLarge
@@ -129,17 +138,24 @@ CoverBackground {
         }
 
         Label {
+            id: second
+
+            readonly property real room: cover.height - cover.actionsHeight - lines.y - y - (more.visible ? more.height + lines.spacing : 0)
+
             objectName: "coverSecond"
             width: parent.width
             text: cover.second()
             color: Theme.secondaryColor
             font.pixelSize: Theme.fontSizeSmall
             wrapMode: Text.Wrap
-            maximumLineCount: 3
+            maximumLineCount: Math.max(1, Math.min(3, Math.floor(room / secondLine.height)))
             truncationMode: TruncationMode.Elide
         }
 
         Label {
+            id: more
+
+            objectName: "coverMore"
             width: parent.width
             visible: text.length > 0
             text: cover.third()
