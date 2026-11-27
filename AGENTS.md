@@ -21,7 +21,7 @@ In this order; later step only once earlier ones hold:
 2. Tests added for it (regression test per bug).
 3. Tests proven to bite: each fails with change reverted or mutated. Report how (e.g. "22/22 mutations caught"); name what headless tests can't prove. Change touches a mutated file (`make -s mutants-paths`) → `make mutants-diff MUTANTS_DIFF=<diff>` clean.
 4. `make check` green locally.
-5. PR CI green: CI (host checks, mutants on changed lines, RPM with Harbour check), CodeQL.
+5. PR CI green: CI (host checks, mutants on changed lines, RPM with Harbour check), SonarQube (quality gate, new-code coverage, zero open issues or hotspots: `tools/ci/sonar-issues.py`), CodeQL.
 6. Device: CI job "Sailfish OS 5.2 aarch64 RPM" builds it on every push; run that RPM on test phone (see "Device tests"); give user the `harbour-nanunana-aarch64` artifact link of the green run and the evidence.
 7. With RPM: outline briefly what merging this PR risks and how you mitigated it.
 
@@ -48,7 +48,7 @@ User tests RPM on phone; that test judges feel, lag, transitions. Say exactly wh
 
 ## Local checks
 
-- Host deps (Ubuntu 24.04): `./tools/ci/install-host-deps.sh [nextest] [mutants] [cross]`: Qt 5 dev files, `lupdate`, pinned Rust 1.95; extras = pinned cargo-nextest (`make test` runs 32 tests at once; without it `cargo test`), cargo-mutants, `libc6-i386`.
+- Host deps (Ubuntu 24.04): `./tools/ci/install-host-deps.sh [nextest] [mutants] [coverage] [cross]`: Qt 5 dev files, `lupdate`, pinned Rust 1.95; extras = pinned cargo-nextest (`make test` runs 32 tests at once; without it `cargo test`), cargo-mutants, cargo-llvm-cov and python3-coverage (`make coverage`), `libc6-i386`.
 - `make check` = rustfmt, comment lint, catalogue drift and German gaps, clippy (`clippy::all` denied), host tests (Rust, tool tests). No network: tests use canned answers (`crates/nanunana-core/tests/fixtures`, `tests/qml/data`).
 - Page tests (`tests/qml/tst_*.qml`, real Silica, Qt 5.6) run only on SDK target: `make rpm && make check-rpm` (docker, `libc6-i386`; also Harbour validator, linked libs, sandbox permissions, installability). QML change → run it, or say only CI did.
 - Missing tool (docker, cargo-mutants) → step skipped locally. Say which; CI runs all.
@@ -108,7 +108,7 @@ Every added or changed test, before push:
 
 ## Releases
 
-- Only on user's go. None cut yet, no tags. Latest `main` commit green first.
+- Only on user's go. None cut yet, no tags. Latest `main` commit green first, Sonar included: check main, not just PR.
 - Strict semver: nothing breaking → minor.
 - Harbour upload stays with user.
 
