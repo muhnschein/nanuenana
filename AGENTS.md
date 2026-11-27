@@ -108,7 +108,7 @@ Every added or changed test, before push:
 
 ## Releases
 
-- Only on user's go. None cut yet, no tags. Latest `main` commit green first, Sonar included: check main, not just PR.
+- Only on user's go. None cut yet, no tags. Latest `main` commit green first, Sonar included: check main, not just PR. `main` commit without runs (push event lost) → start CI, Build, CodeQL on `main` by hand (`workflow_dispatch`).
 - Strict semver: nothing breaking → minor.
 - Harbour upload stays with user.
 
