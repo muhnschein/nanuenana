@@ -8,9 +8,9 @@ use std::sync::{Arc, OnceLock};
 
 static ENGINE: OnceLock<Arc<Engine>> = OnceLock::new();
 
-pub fn open(dir: PathBuf, fetch: Box<dyn Fetch>) -> Arc<Engine> {
+pub fn open(dir: PathBuf, fetch: Box<dyn Fetch>, replay: bool) -> Arc<Engine> {
     ENGINE
-        .get_or_init(|| Arc::new(Engine::open(Store::new(dir), fetch)))
+        .get_or_init(|| Arc::new(Engine::open(Store::new(dir), fetch).replaying(replay)))
         .clone()
 }
 

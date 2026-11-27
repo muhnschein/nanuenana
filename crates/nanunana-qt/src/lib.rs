@@ -8,8 +8,11 @@ pub mod runtime;
 
 use cpp::cpp;
 use nanunana_core::net::{Canned, Fetch, Http};
-use std::ffi::CStr;
+use nanunana_core::paths::data_dir;
+use nanunana_core::source::{source, Source, REPLAY_VARIABLE};
+use std::ffi::{CStr, OsStr};
 use std::os::raw::{c_char, c_int};
+use std::path::PathBuf;
 
 cpp! {{
     #include <QtCore/QCoreApplication>
@@ -204,11 +207,15 @@ fn is_check(args: &[String]) -> bool {
     args.get(1).is_some_and(|a| a == "--qml-check")
 }
 
-fn fetch_for(args: &[String]) -> Box<dyn Fetch> {
-    if is_check(args) {
-        Box::new(Canned::new(canned_dir(args)))
-    } else {
-        Box::new(Http::new())
+fn source_for(args: &[String], variable: Option<&OsStr>) -> Source {
+    let check_answers = is_check(args).then(|| PathBuf::from(canned_dir(args)));
+    source(&data_dir(), check_answers.as_deref(), variable)
+}
+
+fn fetch_for(source: &Source) -> Box<dyn Fetch> {
+    match &source.answers {
+        Some(answers) => Box::new(Canned::new(answers.clone())),
+        None => Box::new(Http::new()),
     }
 }
 
@@ -218,7 +225,9 @@ pub unsafe fn run(argc: c_int, argv: *mut *mut c_char) -> c_int {
     let args: Vec<String> = (0..usize::try_from(argc).unwrap_or_default())
         .map(|i| CStr::from_ptr(*argv.add(i)).to_string_lossy().into_owned())
         .collect();
-    runtime::open(nanunana_core::paths::data_dir(), fetch_for(&args));
+    let from = source_for(&args, std::env::var_os(REPLAY_VARIABLE).as_deref());
+    let fetch = fetch_for(&from);
+    runtime::open(from.store, fetch, from.replay);
     register_types();
     cpp!([argc as "int", argv as "char**"] -> c_int as "int" {
             if (argc > 1 && qstrcmp(argv[1], "--qml-check") == 0) {
@@ -302,5 +311,31 @@ mod tests {
         );
         assert_eq!(canned_dir(&args(&["app", "--qml-check", "a.qml"])), "");
         assert_eq!(canned_dir(&args(&["app", "--qml-check", "-D"])), "");
+    }
+
+    #[test]
+    fn a_plain_start_is_live_and_the_replay_variable_alone_takes_it_off_the_network() {
+        let live = source_for(&args(&["app"]), None);
+        assert_eq!((live.answers, live.replay), (None, false));
+        assert_eq!(live.store, data_dir());
+        let replay = source_for(&args(&["app"]), Some(OsStr::new("levels")));
+        assert_eq!(replay.answers, Some(data_dir().join("replay/levels")));
+        assert!(replay.replay);
+        let empty = source_for(&args(&["app"]), Some(OsStr::new("")));
+        assert!(empty.answers.is_some());
+        assert!(empty.replay);
+    }
+
+    #[test]
+    fn the_check_mode_reads_the_folder_of_its_switch() {
+        let check = source_for(&args(&["app", "--qml-check", "-D", "/data", "a.qml"]), None);
+        assert_eq!(check.answers, Some(PathBuf::from("/data")));
+        assert_eq!((check.store, check.replay), (data_dir(), false));
+        let marked = source_for(
+            &args(&["app", "--qml-check", "-D", "/data", "a.qml"]),
+            Some(OsStr::new("x")),
+        );
+        assert_eq!(marked.answers, Some(PathBuf::from("/data")));
+        assert!(marked.replay);
     }
 }

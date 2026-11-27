@@ -101,6 +101,15 @@ fn ids(rows: &[nanunana_core::view::WarningRow]) -> Vec<&str> {
 }
 
 #[test]
+fn only_an_engine_opened_for_replay_says_so_in_its_view() {
+    let net = FakeNet::default();
+    let dir = tempfile::tempdir().unwrap();
+    assert!(!open(&dir, &net).view(T0).replay);
+    assert!(!open(&dir, &net).replaying(false).view(T0).replay);
+    assert!(open(&dir, &net).replaying(true).view(T0).replay);
+}
+
+#[test]
 fn nothing_is_fetched_before_the_notice_is_accepted() {
     let net = FakeNet::default();
     let dir = tempfile::tempdir().unwrap();

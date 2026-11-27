@@ -39,7 +39,8 @@ MUTANTS_PATHS = crates/nanunana-core/src/alerts.rs crates/nanunana-core/src/bbk.
 	crates/nanunana-core/src/geo.rs crates/nanunana-core/src/model.rs \
 	crates/nanunana-core/src/policy.rs crates/nanunana-core/src/settings.rs \
 	crates/nanunana-core/src/text.rs crates/nanunana-core/src/view.rs \
-	crates/nanunana-core/src/engine.rs crates/nanunana-core/src/gazetteer.rs
+	crates/nanunana-core/src/engine.rs crates/nanunana-core/src/gazetteer.rs \
+	crates/nanunana-core/src/source.rs
 MUTANTS_ARGS = --no-shuffle -j 2 --timeout 300 -p nanunana-core $(addprefix -f ,$(MUTANTS_PATHS))
 
 mutants:

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Test data</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./silica.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div class="amb {{amb}}" style="width: 1180px; height: 860px; display: flex; gap: 40px; align-items: flex-start">
+
+  <div style="width: 400px; height: 860px; position: relative; flex: none">
+  <div class="pull-ind"></div>
+  <div class="hdr">
+    <div class="hdr-t">Places</div>
+    <div class="hdr-d">Updated 14:32</div>
+  </div>
+
+  <div class="box">
+    <svg class="ic err" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>
+    <div>
+      <div class="err" style="font-size: 17px">Test data</div>
+      <div style="margin-top: 4px">These are not real warnings.</div>
+    </div>
+  </div>
+
+  <button class="li tall">
+    <div class="li-b">
+      <div class="li-t">München</div>
+      <div class="li-s">Rauchentwicklung durch Großbrand</div>
+      <div class="lvrow l3"><span class="lv l3" role="img" aria-label="Level 3 of 4"><i></i><i></i><i></i><i></i></span><span class="lvw">Danger</span><span>· 3 warnings</span></div>
+    </div>
+    <div class="li-r">5 km</div>
+  </button>
+
+  <div class="unoff bottom">Unofficial app. In an emergency follow sirens, cell broadcast, radio and the authorities.</div>
+  </div>
+
+  <div style="width: 400px; flex: none">
+  <div class="hdr" style="min-height: 64px">
+    <div class="hdr-t">Events</div>
+  </div>
+  <div class="sh">Nanünana</div>
+  <button class="li tall">
+    <div class="li-ic l3" style="color: var(--c)"><svg class="ic m" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17v-4a5 5 0 0 1 10 0v4M5 17h14v3H5zM12 3v2.5M4.5 6.5L6.3 8.3M19.5 6.5l-1.8 1.8"/></svg></div>
+    <div class="li-b">
+      <div class="li-t">Test data · Danger · München</div>
+      <div class="li-t wrap small sec">Rauchentwicklung durch Großbrand. Integrierte Leitstelle München</div>
+      <div class="li-s">Just now</div>
+    </div>
+  </button>
+  </div>
+
+  <div class="cover l3" style="margin-top: 120px">
+    <div class="err" style="font-size: 17px">Test data</div>
+    <span class="lv big l3" role="img" aria-label="Level 3 of 4"><i></i><i></i><i></i><i></i></span>
+    <div class="lvw" style="font-size: 26px; font-weight: 300; line-height: 1.1">Danger</div>
+    <div style="font-size: 17px">München</div>
+    <div class="small sec" style="line-height: 1.3">Rauchentwicklung durch Großbrand</div>
+    <div class="cover-a"><svg class="ic" viewBox="0 0 24 24" role="img" aria-label="Update now"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/></svg></div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"ambience":{"editor":"enum","options":["dark","light"],"default":"dark"},"$preview":{"width":1180,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return { amb: (this.props.ambience ?? 'dark') === 'light' ? 'light' : 'dark' };
+}
+}
+</script>
+</body>
+</html>

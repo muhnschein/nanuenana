@@ -23,7 +23,8 @@
     "About.dc.html": {"x": 1820, "y": 4300, "w": 400, "h": 1240, "title": "About (whole page)"},
     "AirRaidNotice.dc.html": {"x": 0, "y": 6160, "w": 400, "h": 860, "title": "Later: second notice, Ukraine and Israel"},
     "PlaceAirRaid.dc.html": {"x": 480, "y": 6160, "w": 400, "h": 860, "title": "Later: air raid alert"},
-    "NotOffered.dc.html": {"x": 960, "y": 6160, "w": 400, "h": 860, "title": "Later: not offered here"}
+    "NotOffered.dc.html": {"x": 960, "y": 6160, "w": 400, "h": 860, "title": "Later: not offered here"},
+    "Replay.dc.html": {"x": 0, "y": 8020, "w": 1180, "h": 860, "title": "Test data: home (same box on place and warning), notification, cover"}
   },
   "order": [
     "Notice.dc.html",
@@ -44,14 +45,16 @@
     "About.dc.html",
     "AirRaidNotice.dc.html",
     "PlaceAirRaid.dc.html",
-    "NotOffered.dc.html"
+    "NotOffered.dc.html",
+    "Replay.dc.html"
   ],
   "notes": {
     "row1": {"x": 0, "y": -300, "text": "First start and places", "kind": "title1", "maxW": 2320},
     "row2": {"x": 0, "y": 980, "text": "Adding a place", "kind": "title1", "maxW": 880},
     "row3": {"x": 0, "y": 2260, "text": "Warnings", "kind": "title1", "maxW": 2320},
     "row4": {"x": 0, "y": 4000, "text": "Alerts, settings, about", "kind": "title1", "maxW": 2220},
-    "row5": {"x": 0, "y": 5860, "text": "Later: more countries", "kind": "title1", "maxW": 1360}
+    "row5": {"x": 0, "y": 5860, "text": "Later: more countries", "kind": "title1", "maxW": 1360},
+    "row6": {"x": 0, "y": 7720, "text": "Test mode: replay of canned answers, phone tests only", "kind": "title1", "maxW": 1180}
   },
   "designSystems": []
 }

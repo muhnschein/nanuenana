@@ -43,6 +43,7 @@ pub struct View {
     pub notice_accepted: bool,
     pub checked_ms: i64,
     pub failing: bool,
+    pub replay: bool,
     pub location: &'static str,
     pub places: Vec<PlaceView>,
 }

@@ -95,6 +95,7 @@ pub struct Engine {
     state: Mutex<State>,
     cache: Mutex<Cache>,
     refreshing: Mutex<()>,
+    replay: bool,
 }
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
@@ -212,7 +213,13 @@ impl Engine {
             state: Mutex::new(state),
             cache: Mutex::new(cache),
             refreshing: Mutex::new(()),
+            replay: false,
         }
+    }
+
+    pub fn replaying(mut self, replay: bool) -> Engine {
+        self.replay = replay;
+        self
     }
 
     fn save_state(&self, state: &State) {
@@ -567,6 +574,7 @@ impl Engine {
             notice_accepted: state.notice_accepted,
             checked_ms: state.checked_ms,
             failing: state.failing_since_ms > 0,
+            replay: self.replay,
             location: state.location_state(self.gazetteer),
             places: state
                 .targets(self.gazetteer)
