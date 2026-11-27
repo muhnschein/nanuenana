@@ -10,11 +10,15 @@ HOST = "https://sonarcloud.io"
 PAGE_SIZE = 500
 
 
-def fetch(path):
+def api_request(path, token):
     request = urllib.request.Request(HOST + "/api/" + path)
-    token = base64.b64encode((os.environ["SONAR_TOKEN"] + ":").encode()).decode()
-    request.add_header("Authorization", "Basic " + token)
-    with urllib.request.urlopen(request, timeout=60) as response:
+    if token:
+        request.add_header("Authorization", "Basic " + base64.b64encode((token + ":").encode()).decode())
+    return request
+
+
+def fetch(path):
+    with urllib.request.urlopen(api_request(path, os.environ.get("SONAR_READ_TOKEN")), timeout=60) as response:
         return json.load(response)
 
 

@@ -74,5 +74,17 @@ class Report(unittest.TestCase):
         ])
 
 
+
+class Request(unittest.TestCase):
+    def test_token_goes_as_basic_auth_user(self):
+        request = sonar.api_request("issues/search?x=1", "squ_abc")
+        self.assertEqual(request.full_url, "https://sonarcloud.io/api/issues/search?x=1")
+        self.assertEqual(request.get_header("Authorization"), "Basic c3F1X2FiYzo=")
+
+    def test_no_token_sends_no_auth(self):
+        for token in (None, ""):
+            self.assertFalse(sonar.api_request("issues/search?x=1", token).has_header("Authorization"))
+
+
 if __name__ == "__main__":
     unittest.main()
