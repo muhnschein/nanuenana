@@ -116,13 +116,21 @@ pub fn kind_key(kind: Kind) -> &'static str {
     }
 }
 
+fn headline_of(summary: &Summary, chosen: Option<&Text>) -> String {
+    chosen
+        .map(|t| t.headline.clone())
+        .filter(|h| !h.is_empty())
+        .unwrap_or_else(|| summary.headline.clone())
+}
+
+pub fn headline(summary: &Summary, cached: Option<&Cached>, language: &str) -> String {
+    headline_of(summary, text::pick(texts_of(summary, cached), language))
+}
+
 pub fn row(summary: &Summary, cached: Option<&Cached>, language: &str) -> WarningRow {
     let texts = texts_of(summary, cached);
     let chosen = text::pick(texts, language);
-    let headline = chosen
-        .map(|t| t.headline.clone())
-        .filter(|h| !h.is_empty())
-        .unwrap_or_else(|| summary.headline.clone());
+    let headline = headline_of(summary, chosen);
     WarningRow {
         id: summary.id.clone(),
         category: summary.category.key(),

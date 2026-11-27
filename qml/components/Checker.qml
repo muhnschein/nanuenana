@@ -30,14 +30,19 @@ Item {
     function run() {
         if (!allowed || App.checking || waitingForFix)
             return false
-        if (locating && source.valid) {
+        if (locating) {
             waitingForFix = true
             fixGuard.restart()
-            source.update()
+            ask()
         } else {
             App.check()
         }
         return true
+    }
+
+    function ask() {
+        if (waitingForFix && source.valid)
+            source.update()
     }
 
     function proceed() {
@@ -48,7 +53,7 @@ Item {
         App.check()
     }
 
-    onLocatingChanged: if (locating) run()
+    onLocatingChanged: locating ? run() : proceed()
 
     BackgroundJob {
         id: job
@@ -65,7 +70,10 @@ Item {
     PositionSource {
         id: source
 
+        objectName: "positions"
         active: false
+        onValidChanged: checker.ask()
+        onSupportedPositioningMethodsChanged: checker.ask()
         onPositionChanged: {
             if (!position.latitudeValid || !position.longitudeValid)
                 return
