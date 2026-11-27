@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
 import importlib.util
+import io
 import pathlib
 import unittest
 
@@ -37,6 +38,21 @@ class Gaps(unittest.TestCase):
         found = untranslated.gaps(text)
         self.assertEqual([gap.split(":")[0] for gap in found], ["a", "b", "c"])
         self.assertIn("%1, %2", found[0])
+
+
+class Run(unittest.TestCase):
+    def test_a_finished_catalogue_passes_in_silence(self):
+        errors = io.StringIO()
+        text = message("a", "Until %1", "<translation>Bis %1</translation>")
+        self.assertEqual(untranslated.main(io.StringIO(text), errors), 0)
+        self.assertEqual(errors.getvalue(), "")
+
+    def test_every_gap_is_named_and_fails_the_run(self):
+        errors = io.StringIO()
+        text = message("a", "Save", '<translation type="unfinished"></translation>')
+        text += message("b", "Quit", "<translation> </translation>")
+        self.assertEqual(untranslated.main(io.StringIO(text), errors), 1)
+        self.assertEqual(errors.getvalue(), "untranslated: a: not translated\nuntranslated: b: empty translation\n")
 
 
 if __name__ == "__main__":

@@ -10,37 +10,32 @@ SOURCE = re.compile(r"<source>(.*?)</source>", re.S)
 PLACEHOLDER = re.compile(r"%(?:n|L?\d+)")
 
 
+def gap(message):
+    name = message.group("id")
+    translation = TRANSLATION.search(message.group("body"))
+    if translation is None or "unfinished" in translation.group("attrs"):
+        return f"{name}: not translated"
+    texts = FORM.findall(translation.group("text")) if message.group("numerus") else [translation.group("text")]
+    if not texts or not all(t.strip() for t in texts):
+        return f"{name}: empty translation"
+    source = SOURCE.search(message.group("body"))
+    wanted = sorted(set(PLACEHOLDER.findall(source.group(1)))) if source else []
+    if any(sorted(set(PLACEHOLDER.findall(one))) != wanted for one in texts):
+        return f"{name}: placeholders differ from the source ({', '.join(wanted) or 'none'})"
+    return None
+
+
 def gaps(text):
-    found = []
-    for message in MESSAGE.finditer(text):
-        name = message.group("id")
-        translation = TRANSLATION.search(message.group("body"))
-        if translation is None or "unfinished" in translation.group("attrs"):
-            found.append(f"{name}: not translated")
-            continue
-        texts = FORM.findall(translation.group("text")) if message.group("numerus") else [translation.group("text")]
-        if not texts or not all(t.strip() for t in texts):
-            found.append(f"{name}: empty translation")
-            continue
-        source = SOURCE.search(message.group("body"))
-        wanted = sorted(set(PLACEHOLDER.findall(source.group(1)))) if source else []
-        for one in texts:
-            if sorted(set(PLACEHOLDER.findall(one))) != wanted:
-                found.append(f"{name}: placeholders differ from the source ({', '.join(wanted) or 'none'})")
-                break
-    return found
+    return [found for found in map(gap, MESSAGE.finditer(text)) if found]
 
 
-def main(argv):
-    if len(argv) != 2:
-        print("usage: untranslated.py CATALOGUE.ts", file=sys.stderr)
-        return 2
-    with open(argv[1], encoding="utf-8") as catalogue:
-        found = gaps(catalogue.read())
-    for gap in found:
-        print(f"untranslated: {gap}", file=sys.stderr)
+def main(catalogue, errors):
+    found = gaps(catalogue.read())
+    for one in found:
+        print(f"untranslated: {one}", file=errors)
     return 1 if found else 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.stdin.reconfigure(encoding="utf-8")
+    sys.exit(main(sys.stdin, sys.stderr))

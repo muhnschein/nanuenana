@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
+import contextlib
 import importlib.util
+import io
 import pathlib
+import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location("places", pathlib.Path(__file__).with_name("places.py"))
@@ -72,6 +75,32 @@ class Build(unittest.TestCase):
 class Postcodes(unittest.TestCase):
     def test_only_lines_starting_with_a_postcode_count(self):
         self.assertEqual(places.postcodes([",lat,lng\n", "01067,51.0,13.7\n", "x\n", "86150,48.3,10.9\n"]), {"01067", "86150"})
+
+
+class Run(unittest.TestCase):
+    def test_both_lists_are_written_from_the_two_downloads(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sources = pathlib.Path(tmp) / "downloads"
+            data = pathlib.Path(tmp) / "data"
+            sources.mkdir()
+            data.mkdir()
+            (sources / places.GEONAMES).write_text(
+                "country_code,zipcode,place,state,state_code,province,province_code,community,community_code,latitude,longitude\n"
+                "DE,50667,Köln,NW,NW,,,Kreisfreie Stadt Köln,05315,50.0,7.0\n"
+                "DE,51143,Porz,NW,NW,,,Kreisfreie Stadt Köln,05315,50.0,7.0\n",
+                encoding="utf-8",
+            )
+            (sources / places.DELIVERY).write_text("plz,lat,lng\n50667,50.0,7.0\n", encoding="utf-8")
+            said = io.StringIO()
+            with contextlib.redirect_stdout(said):
+                self.assertEqual(places.main(sources, data), 0)
+            self.assertEqual(said.getvalue(), "1 places, 1 districts\n")
+            self.assertEqual((data / "de-places.tsv").read_text(encoding="utf-8"), "Köln\t05315\t50.0000\t7.0000\t50667\n")
+            self.assertEqual((data / "de-districts.tsv").read_text(encoding="utf-8"), "05315\tKreisfreie Stadt Köln\n")
+
+    def test_the_lists_land_in_the_core_data_folder(self):
+        self.assertEqual(places.DATA, pathlib.Path(__file__).resolve().parent.parent / "crates" / "nanunana-core" / "data")
+        self.assertTrue((places.DATA / "de-places.tsv").is_file())
 
 
 if __name__ == "__main__":

@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
+import io
 import json
-import pathlib
 import re
 import sys
+import tarfile
 import urllib.error
 import urllib.request
 
 BASE = "https://warnung.bund.de/api31"
-DISTRICT = re.compile(r"[0-9]{5}")
+DISTRICT = re.compile(r"\d{5}", re.ASCII)
 IDENTIFIER = re.compile(r"(?!\.)[A-Za-z0-9._-]{1,200}")
-USAGE = "usage: replay.py record SET DISTRICT...\n       replay.py archive SET DISTRICT ARCHIVE_ID"
+USAGE = "usage: replay.py record DISTRICT... > SET.tar\n       replay.py archive DISTRICT ARCHIVE_ID > SET.tar"
 
 
 class Refused(Exception):
@@ -99,7 +100,7 @@ def entry_for(warning):
     }
 
 
-def archive(district, archive_id, fetch, listed_before=None):
+def archive(district, archive_id, fetch):
     name = dashboard_name(district)
     body = fetch(f"{BASE}/archive.mowas/{checked(archive_id)}.json")
     if body is None:
@@ -111,45 +112,37 @@ def archive(district, archive_id, fetch, listed_before=None):
     if not isinstance(warning, dict):
         raise Refused(f"archive answer for {archive_id} is not a warning")
     entry = entry_for(warning)
-    entries = [old for old in (listed_before or []) if not (isinstance(old, dict) and old.get("id") == entry["id"])]
-    entries.append(entry)
-    listing = (json.dumps(entries, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    listing = (json.dumps([entry], ensure_ascii=False, indent=2) + "\n").encode("utf-8")
     return {name: listing, f"{entry['id']}.json": body}
 
 
-def write(folder, files):
-    folder.mkdir(parents=True, exist_ok=True)
-    for name, body in sorted(files.items()):
-        (folder / name).write_bytes(body)
-        print(f"{folder / name}: {len(body)} bytes")
+def packed(files):
+    held = io.BytesIO()
+    with tarfile.open(fileobj=held, mode="w") as tar:
+        for name, body in sorted(files.items()):
+            member = tarfile.TarInfo(name)
+            member.size = len(body)
+            tar.addfile(member, io.BytesIO(body))
+    return held.getvalue()
 
 
-def before(folder, district):
-    path = folder / dashboard_name(district)
-    if not path.is_file():
-        return []
+def main(argv, fetch, out, errors):
     try:
-        entries = json.loads(path.read_bytes())
-    except ValueError:
-        return []
-    return entries if isinstance(entries, list) else []
-
-
-def main(argv):
-    try:
-        if len(argv) >= 4 and argv[1] == "record":
-            write(pathlib.Path(argv[2]), record(argv[3:], http))
-            return 0
-        if len(argv) == 5 and argv[1] == "archive":
-            folder = pathlib.Path(argv[2])
-            write(folder, archive(argv[3], argv[4], http, before(folder, argv[3])))
-            return 0
+        if len(argv) >= 3 and argv[1] == "record":
+            files = record(argv[2:], fetch)
+        elif len(argv) == 4 and argv[1] == "archive":
+            files = archive(argv[2], argv[3], fetch)
+        else:
+            print(USAGE, file=errors)
+            return 2
     except Refused as refusal:
-        print(f"replay.py: {refusal}", file=sys.stderr)
+        print(f"replay.py: {refusal}", file=errors)
         return 1
-    print(USAGE, file=sys.stderr)
-    return 2
+    out.write(packed(files))
+    for name, body in sorted(files.items()):
+        print(f"{name}: {len(body)} bytes", file=errors)
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(sys.argv, http, sys.stdout.buffer, sys.stderr))

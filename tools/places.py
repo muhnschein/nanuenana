@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 import collections
 import csv
+import pathlib
 import re
 import sys
 
@@ -13,6 +14,9 @@ ORGANISATION = re.compile(
 )
 EXONYMS = {"Nuremberg": "Nürnberg", "Munich": "München", "Cologne": "Köln", "Hanover": "Hannover"}
 STATES = ("02000", "11000")
+GEONAMES = "zipcodes.de.csv"
+DELIVERY = "plz_geocoord.csv"
+DATA = pathlib.Path(__file__).resolve().parent.parent / "crates" / "nanunana-core" / "data"
 
 
 def district_name(district, names, codes):
@@ -62,21 +66,18 @@ def build(rows, delivered):
     return place_lines, district_lines
 
 
-def main(argv):
-    if len(argv) != 5:
-        print("usage: places.py GEONAMES_POSTAL.csv DELIVERY_POSTCODES.csv PLACES.tsv DISTRICTS.tsv", file=sys.stderr)
-        return 2
-    with open(argv[2], encoding="utf-8") as source:
+def main(sources, data):
+    with open(sources / DELIVERY, encoding="utf-8") as source:
         delivered = postcodes(source)
-    with open(argv[1], encoding="utf-8", newline="") as source:
+    with open(sources / GEONAMES, encoding="utf-8", newline="") as source:
         place_lines, district_lines = build(csv.DictReader(source), delivered)
-    with open(argv[3], "w", encoding="utf-8") as out:
+    with open(data / "de-places.tsv", "w", encoding="utf-8") as out:
         out.writelines(place_lines)
-    with open(argv[4], "w", encoding="utf-8") as out:
+    with open(data / "de-districts.tsv", "w", encoding="utf-8") as out:
         out.writelines(district_lines)
     print(f"{len(place_lines)} places, {len(district_lines)} districts")
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv))
+    sys.exit(main(pathlib.Path.cwd(), DATA))

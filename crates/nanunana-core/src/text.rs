@@ -16,7 +16,7 @@ const BREAKING: &[&str] = &["br", "p", "div", "li", "tr"];
 fn tag_name(tag: &str) -> String {
     tag.trim_start_matches('/')
         .chars()
-        .take_while(|c| c.is_ascii_alphanumeric())
+        .take_while(char::is_ascii_alphanumeric)
         .collect::<String>()
         .to_ascii_lowercase()
 }

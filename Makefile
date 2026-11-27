@@ -87,7 +87,7 @@ translations-check:
 	cp translations/harbour-nanunana-de.ts $(TMP)/nanunana-ts-de.ts
 	$(LUPDATE) $(LUPDATE_ARGS) -target-language de qml -ts $(TMP)/nanunana-ts-de.ts
 	diff -u translations/harbour-nanunana-de.ts $(TMP)/nanunana-ts-de.ts
-	python3 tools/untranslated.py translations/harbour-nanunana-de.ts
+	python3 tools/untranslated.py < translations/harbour-nanunana-de.ts
 
 clean:
 	$(CARGO) clean

@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-import contextlib
 import importlib.util
 import io
 import json
 import pathlib
-import tempfile
+import tarfile
 import unittest
 
 spec = importlib.util.spec_from_file_location("replay", pathlib.Path(__file__).with_name("replay.py"))
@@ -81,7 +80,7 @@ class Record(unittest.TestCase):
             self.assertEqual(len(net.asked), 1)
 
     def test_a_bad_district_or_a_missing_dashboard_is_refused(self):
-        for district in ("9162", "091620", "0916a", "../09162", ""):
+        for district in ("9162", "091620", "0916a", "../09162", "", "٠٩١٦٢"):
             with self.assertRaises(replay.Refused, msg=district):
                 replay.record([district], Anything())
         with self.assertRaises(replay.Refused):
@@ -119,15 +118,6 @@ class Archive(unittest.TestCase):
         }])
         self.assertIn("Großbrand".encode("utf-8"), files["034030000000.json"])
 
-    def test_it_joins_what_the_set_already_lists_and_replaces_its_own_entry(self):
-        body = json.dumps(WARNING).encode()
-        net = Net({f"{BASE}/archive.mowas/x_1.json": body})
-        old = [{"id": "pol.X"}, {"id": "mow.DE-NI-OL-W015-20230121-001", "old": True}, "odd"]
-        files = replay.archive("03403", "x_1", net, old)
-        entries = json.loads(files["034030000000.json"])
-        self.assertEqual([e["id"] if isinstance(e, dict) else e for e in entries], ["pol.X", "odd", "mow.DE-NI-OL-W015-20230121-001"])
-        self.assertNotIn("old", entries[2])
-
     def test_without_a_german_text_the_first_one_is_listed(self):
         warning = dict(WARNING, info=[{"language": "en", "headline": "Fire", "severity": "Minor"}])
         net = Net({f"{BASE}/archive.mowas/x_1.json": json.dumps(warning).encode()})
@@ -163,31 +153,51 @@ class Archive(unittest.TestCase):
         self.assertEqual(net.asked, [])
 
 
-class Files(unittest.TestCase):
-    def test_a_set_is_written_and_read_back_for_the_next_archive_call(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            folder = pathlib.Path(tmp) / "sets" / "one"
-            said = io.StringIO()
-            with contextlib.redirect_stdout(said):
-                replay.write(folder, {"034030000000.json": b'[{"id": "pol.X"}]', "pol.X.json": b"{}"})
-            self.assertEqual(said.getvalue().count("bytes"), 2)
-            self.assertEqual((folder / "pol.X.json").read_bytes(), b"{}")
-            self.assertEqual(replay.before(folder, "03403"), [{"id": "pol.X"}])
-            self.assertEqual(replay.before(folder, "09162"), [])
-            (folder / "091620000000.json").write_bytes(b"{}")
-            self.assertEqual(replay.before(folder, "09162"), [])
-            (folder / "091620000000.json").write_bytes(b"broken")
-            self.assertEqual(replay.before(folder, "09162"), [])
+def unpacked(packed):
+    with tarfile.open(fileobj=io.BytesIO(packed)) as tar:
+        return {member.name: tar.extractfile(member).read() for member in tar.getmembers()}
 
-    def test_wrong_use_prints_the_usage(self):
-        said = io.StringIO()
-        with contextlib.redirect_stderr(said):
-            self.assertEqual(replay.main(["replay.py"]), 2)
-            self.assertEqual(replay.main(["replay.py", "record", "set"]), 2)
-            self.assertEqual(replay.main(["replay.py", "archive", "set", "03403"]), 2)
-            self.assertEqual(said.getvalue().count("usage:"), 3)
-            self.assertEqual(replay.main(["replay.py", "record", "set", "x"]), 1)
-        self.assertIn("not a district code: x", said.getvalue())
+
+class Run(unittest.TestCase):
+    def run_with(self, net, *words):
+        out = io.BytesIO()
+        errors = io.StringIO()
+        status = replay.main(["replay.py", *words], net, out, errors)
+        return status, out.getvalue(), errors.getvalue()
+
+    def test_a_recorded_set_leaves_as_one_archive_of_its_files(self):
+        net = Net({
+            f"{BASE}/dashboard/034030000000.json": listing("pol.X"),
+            f"{BASE}/warnings/pol.X.json": b'{"a": "\xc3\xa4"}',
+            f"{BASE}/dashboard/091620000000.json": b"[]",
+        })
+        status, out, errors = self.run_with(net, "record", "03403", "09162")
+        self.assertEqual(status, 0)
+        self.assertEqual(unpacked(out), {
+            "034030000000.json": listing("pol.X"),
+            "091620000000.json": b"[]",
+            "pol.X.json": b'{"a": "\xc3\xa4"}',
+        })
+        self.assertEqual(list(unpacked(out)), ["034030000000.json", "091620000000.json", "pol.X.json"])
+        self.assertEqual(errors, f"034030000000.json: {len(listing('pol.X'))} bytes\n091620000000.json: 2 bytes\npol.X.json: 11 bytes\n")
+
+    def test_an_archived_warning_leaves_as_archive_too(self):
+        net = Net({f"{BASE}/archive.mowas/x_1.json": json.dumps(WARNING).encode()})
+        status, out, errors = self.run_with(net, "archive", "03403", "x_1")
+        self.assertEqual(status, 0)
+        self.assertEqual(sorted(unpacked(out)), ["034030000000.json", "mow.DE-NI-OL-W015-20230121-001.json"])
+        self.assertEqual(errors.count(" bytes\n"), 2)
+
+    def test_wrong_use_prints_the_usage_and_writes_nothing(self):
+        for words in ((), ("record",), ("archive", "03403"), ("archive", "03403", "x_1", "more"), ("replay", "03403"), ("replay", "03403", "x_1")):
+            status, out, errors = self.run_with(Anything(), *words)
+            self.assertEqual((status, out, errors), (2, b"", replay.USAGE + "\n"), msg=words)
+
+    def test_a_refusal_is_said_and_writes_nothing(self):
+        status, out, errors = self.run_with(Anything(), "record", "x")
+        self.assertEqual((status, out, errors), (1, b"", "replay.py: not a district code: x\n"))
+        status, out, errors = self.run_with(Net({}), "archive", "03403", "x_1")
+        self.assertEqual((status, out, errors), (1, b"", "replay.py: not in the archive: x_1\n"))
 
 
 if __name__ == "__main__":
