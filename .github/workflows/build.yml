@@ -70,6 +70,8 @@ jobs:
           args: >
             -Dsonar.organization=${{ steps.auth.outputs.organization }}
             -Dsonar.projectKey=${{ steps.auth.outputs.project-key }}
+            -Dsonar.rust.lcov.reportPaths=${{ github.workspace }}/coverage/lcov.info
+            -Dsonar.rust.clippy.reportPaths=${{ github.workspace }}/coverage/clippy.json
       - name: No open issues or hotspots
         if: (success() || failure()) && steps.auth.outcome == 'success'
         env:
