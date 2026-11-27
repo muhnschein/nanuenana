@@ -25,13 +25,14 @@ What Nanünana is: `PROJECT.md`. UI: design canvas in `../design` (one `.dc.html
 ## Layout
 
 ```
-crates/nanunana-core     no Qt; model, bbk, geo, gazetteer, alerts, engine, settings, store, net, policy, text, view
+crates/nanunana-core     no Qt; model, bbk, geo, gazetteer, alerts, engine, settings, store, net, policy, source, text, view
 crates/nanunana-qt       App singleton (qmetaobject), C++ glue (SailfishApp, translations, --qml-check)
 crates/harbour-nanunana  binary (exported C main)
 qml/                     pages/, components/, cover/, icons/
 tests/qml                page tests for SDK target, canned answers in data/
+tests/replay             replay sets for phone tests (`doc/PROJECT.md` "Replay")
 tests/translations       catalogue test for SDK target
-tools/                   comment lint, catalogue tools, place list generator, ci/
+tools/                   comment lint, catalogue tools, place list generator, replay recorder, ci/
 design/                  canvas boards, style kit
 ```
 
